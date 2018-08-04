@@ -1,9 +1,25 @@
 Package: LivingFlood
-Title: What the Package Does (one line, title case)
+Title: Map Flood extents using HAND and the National Water Model
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-Depends: R (>= 3.4.1)
-License: What license is it under?
+Authors@R: person("Mike", "Johnson", role = c("aut", "cre"), email = "mike.johnson@geog.ucsb.edu")
+Maintainer: Mike Johnson <mike.johnson@geog.ucsb.edu>
+BugReports: https://github.com/mikejohnson51/nwm/issues
+Description: This package aggregates the needed data to map flood extents using 
+    the Height Above Nearest Drainage (HAND) products and the National Water Model. Users 
+    can define their region of interest and monitor real-time flood extents or look a back     
+    to past events archived by the NWM.
 Encoding: UTF-8
+Depends:
+    R(>= 3.3.0),
+    AOI,
+    nwm
+Imports:
+    curl,
+    data.table,
+    raster,
+    magrittr,
+    sf,
+    utils
+License: MIT + file LICENSE
 LazyData: true
+RoxygenNote: 6.0.1

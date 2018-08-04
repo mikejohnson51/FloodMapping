@@ -1,0 +1,43 @@
+# Sample .travis.yml for R projects.
+#
+# See README.md for instructions, or for more configuration options,
+# see the wiki:
+#   https://github.com/craigcitro/r-travis/wiki
+
+language: r
+cache: packages
+sudo: required
+dist: trusty
+
+matrix:
+  include:
+    - os: linux
+      r: release
+
+before_install:
+  - sudo add-apt-repository ppa:ubuntugis/ppa --yes
+  - sudo apt-get --yes --force-yes update -qq
+  - sudo apt-get install --yes libudunits2-dev libproj-dev libgeos-dev libgdal-dev libcurl4-openssl-dev netcdf-bin
+
+env:
+   global:
+     - R_BUILD_ARGS="--no-vignettes --no-manual"
+     - R_CHECK_ARGS="--no-vignettes --no-manual --as-cran"
+     - NOT_CRAN="true"
+     - _R_CHECK_FORCE_SUGGESTS_=false
+
+warnings_are_errors: false
+
+r_github_packages:
+  - mikejohnson51/AOI
+  - mikejohnson51/nwm
+
+script:
+  - |
+    R CMD build .
+    travis_wait 20 R CMD check LivingFlood*tar.gz
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change

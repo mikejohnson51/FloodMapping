@@ -4,56 +4,21 @@
 #'
 #' Generate near real-time and forecasted flood extents using the National Water Model
 #'
-#' See the README on
+#' See the README on github
 #'
 #' @docType package
-#' 
+#'
 #' @name LivingFlood
 #'
-#' @importFrom  tidyr drop_na gather
-#'
-#' @importFrom  dplyr filter mutate %>% arrange select
-#'
-#' @importFrom  utils download.file unzip data type.convert
-#'
-#' @importFrom  methods as
-#'
-#' @importFrom  stats setNames reshape
-#'
-#' @importFrom  dismo geocode
-#'
-#' @importFrom  RCurl getURL
-#'
-#' @importFrom  data.table fread
-#'
-#' @importFrom  XML xmlToDataFrame
-#'
-#' @importFrom  ncdf4 nc_open nc_close ncvar_get ncatt_get
-#'
-#' @importFrom  lubridate ymd_hms
-#'
-#' @importFrom  rgeos gIntersection
-#'
-#' @importFrom  USAboundaries us_counties us_states
-#'
-#' #@importFrom xts xts
-#'
-#'@importFrom raster raster
-#'
-
+#' @import AOI
+#' @import nwm
+#' @importFrom data.table fread
+#' @importFrom raster raster merge extent intersect crop crs writeRaster
+#' @importFrom sf read_sf write_sf as_Spatial st_transform
+#' @importFrom curl curl_download
+#' @importFrom utils read.csv write.csv globalVariables
 
 NULL
 
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
-if(getRversion() >= "2.15.1")  { utils::globalVariables(c("LAT", "LON",
-                                                        "State", "Longitude", "Latitude",
-                                                        "nid_cleaned",
-                                                        "usgsStations",
-                                                        "snotel",
-                                                        "daymet_tiles",
-                                                        "kopRas",
-                                                        "DAY", "site_no", "YEAR", "MONTH",
-                                                        "year_2000", "year_2005", "year_2010", "COUNTY", "ID",
-                                                        "PARAMETER", "Date", ".", "ap"))
-}
-
+if(getRversion() >= "2.15.1"){  utils::globalVariables(c("path", "ratings")) }
