@@ -2,10 +2,12 @@ mosaic.lf = function(input, bb, write.path){
 
   s = list()
 
+  if(grepl('Spatial', class(bb))){ bb = sf::st_as_sf(bb)}
+
   for(i in seq_along(input)){
     dat <- raster::raster(input[i])
 
-    bb = as_Spatial(sf::st_transform(bb, dat@crs))
+    bb = sf::as_Spatial(sf::st_transform(bb, as.character(dat@crs)))
 
     if(!is.null(raster::intersect(raster::extent(dat),raster::extent(bb)))){
       s[[paste0("raster", i)]] <- raster::crop(dat, bb, snap = "out")

@@ -14,7 +14,7 @@
 #' @import nwm
 #' @importFrom data.table fread
 #' @importFrom raster raster merge extent intersect crop crs writeRaster
-#' @importFrom sf read_sf write_sf as_Spatial st_transform
+#' @importFrom sf read_sf write_sf as_Spatial st_transform st_as_sf
 #' @importFrom curl curl_download
 #' @importFrom utils read.csv write.csv globalVariables
 
