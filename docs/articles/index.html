@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Getting Statrted • Flood Mapping</title>
+<title>Getting Started • Flood Mapping</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Getting Statrted">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Getting Started">
 <meta property="og:description" content="">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
@@ -54,6 +54,9 @@
 <li>
       <a href="../articles/index.html">Getting Started</a>
     </li>
+    <li>
+      <a href="../articles/getData.html">Getting Static Data</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -76,7 +79,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Getting Statrted</h1>
+      <h1>Getting Started</h1>
             
       
       
@@ -93,10 +96,8 @@
 <p>The challenge then is getting these two massive data set to integrate in a way that can provide detailed and timely, flood forecasts. This package aims to meet this need by providing an interface between the NFIE HAND products and the NOAA forecasts to generate forecasted flood maps for an Area of Interest (AOI). AOIs are determined using the <a href="https://mikejohnson51.github.io/AOI/">AOI package</a> and National Water Model data is collected via a wrapper around the <a href="https://github.com/mikejohnson51/NWM">NWM package</a> both of which are dependencies for the package.</p>
 <p>This package in conceptualized as a way of dealing with static HAND data once, and then being able to process temporal NWM data for the same area quickly over and over. To accomplish this this package enforces a folder hierarchy and a workflow that is dependent on this set up. Most simply though it just means that all work should be run from a single working directory. The easiest way to do this is to run all of your flood mapping work from and RStudio Project (generally good practice for all levels of R development). At there most basic level RStudio Projects allow you to work from a defined working directory, workspace, history, and source documents.</p>
 <p>To create a new RStudio Project, launch R studio, and select ‘FILE &gt; NEW PROJECT’. From the popup dialogue elect to create a project in a new directory, select a NEW PROJECT.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/knitr/topics/include_graphics">include_graphics</a></span>(<span class="st">"imgs/new.png"</span>)</code></pre></div>
 <p><img src="imgs/new.png" width="400px"></p>
 <p>Name it something generic (eg ‘FloodMapping’) and select the directory where the folder should go on your local machine:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/knitr/topics/include_graphics">include_graphics</a></span>(<span class="st">"imgs/setup.png"</span>)</code></pre></div>
 <p><img src="imgs/setup.png" width="400px"></p>
 <p>After that, select create and navigate to the location you instructed. In the folder you will see an Rproj file. Double click it to launch the associated RStudio project, from here you are ready to go! Each time you want to work with HAND and NWM data for flood mapping doing so from this project will ensure you have access to all the raw and processed data you have already generated.</p>
 </div>

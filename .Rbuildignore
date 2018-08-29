@@ -5,3 +5,4 @@ inProgress
 .travis.yml
 _pkgdown.yml
 docs
+vignettes

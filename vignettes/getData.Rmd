@@ -96,8 +96,6 @@ read.csv("./LIVINGFLOOD/meta_data.csv")
 read.csv("/Users/mikejohnson/Documents/GitHub/LivingFlood/vignettes/meta_data2.csv")
 ```
 
-Looking more closly at the RAW folder we find three sub folders each with HAND, CATCHMASK, or RATING-CURVE raw data for all regions that have been requested in the past. These are stored here so that any new region within a HUC6 that has already been procesedded can be quickly processed:
-
 ```{r, eval = F}
 data = getAOI('Denver') %>% getData(name = "denver")
 ```
@@ -106,6 +104,9 @@ read.csv("./LIVINGFLOOD/meta_data.csv")
 ```
 
 ### RAW Data
+
+Looking more closly at the RAW folder we find three sub folders each with HAND, CATCHMASK, or RATING-CURVE raw data for all regions that have been requested in the past. These are stored here so that any new region within a HUC6 that has already been procesedded can be quickly processed:
+
 ```{r, out.width = "600px", echo = FALSE}
 knitr::include_graphics("imgs/raw.png")
 ```

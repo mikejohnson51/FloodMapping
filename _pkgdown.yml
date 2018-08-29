@@ -19,6 +19,8 @@ navbar:
       menu:
       -  text: Getting Started
          href: articles/index.html
+      -  text: Getting Static Data
+         href: articles/getData.html
     - icon: fa-file-code-o
       text: "functions"
       href: reference/index.html
