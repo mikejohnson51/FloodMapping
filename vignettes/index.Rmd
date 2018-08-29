@@ -1,5 +1,5 @@
 ---
-title: Getting Statrted
+title: Getting Started
 ---
 
 ```{r echo = FALSE, results='hide', warning= FALSE,message=FALSE}
@@ -23,7 +23,7 @@ This package in conceptualized as a way of dealing with static HAND data once, a
 
 To create a new RStudio Project, launch R studio, and select 'FILE > NEW PROJECT'. From the popup dialogue elect to create a project in a new directory, select a NEW PROJECT.
 
-```{r, out.width = "400px"}
+```{r, out.width = "400px", echo=FALSE}
 knitr::include_graphics("imgs/new.png")
 ```
 
@@ -32,7 +32,7 @@ Name it something generic (eg 'FloodMapping') and select the directory where the
 
 
 
-```{r, out.width = "400px"}
+```{r, out.width = "400px", echo = FALSE}
 knitr::include_graphics("imgs/setup.png")
 ```
 
