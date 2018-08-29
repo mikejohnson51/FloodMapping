@@ -1,4 +1,4 @@
-#Flood Mapping <img src="man/figures/logo.png" width=160 height = 120 align="right"/>
+# Flood Mapping <img src="man/figures/logo.png" width=160 height = 120 align="right"/>
 
 [![Build Status](https://travis-ci.org/mikejohnson51/FloodMapping.svg?branch=master)](https://travis-ci.org/mikejohnson51/FloodMapping)
 
@@ -8,7 +8,7 @@ FloodMapper is design to help users get the data they need, archive it on their 
 
 This package calls upon the [AOI](https://github.com/mikejohnson51/AOI) and [nwm](https://github.com/mikejohnson51/nwm) packages to forecast flood extents using the HAND methodology and is a continuation of the 'LivingFlood' project demonstrated at the 2017 CUASHI HydroInformatics Conference in Tuscaloosa, AL.
 
-##The HAND datasets are a product of:
+## The HAND datasets are a product of:
 
 Liu, Yan Y., David R. Maidment, David G. Tarboton, Xing Zheng, and Shaowen Wang. 2018. A CyberGIS Integration and Computation Framework for High-Resolution Continental-Scale Flood Inundation Mapping. Journal of the American Water Resources Association (JAWRA). Accepted.
 
