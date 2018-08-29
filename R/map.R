@@ -1,3 +1,11 @@
+#' @title Map flood extents from processed data
+#' @description This function takes a folder of processed data and generates a HAND inudation raster for each timestep
+#' @param name.dir the directory where processed data is stored
+#' @param write logical. Should output rasters be written to disk (default = TRUE)
+#' @return a raster stack of innudation maps
+#' @export
+#' @author Mike Johnson
+
 map = function(name.dir, write = TRUE){
 
   j = NULL
@@ -40,16 +48,15 @@ map = function(name.dir, write = TRUE){
   colnames(stage) = c('COMID', paste0("timestep", 1:(dim(stage)[2]-1)))
   stage = as.data.frame(stage, stringsAsFactors = FALSE)
 
-  flood.rast = list()
   catch.v = as.vector(t(catchmentv$rasterbands[[1]]))
   hand.v =  as.vector(t(handv$rasterbands[[1]]))
 
   doParallel::registerDoParallel( parallel::detectCores() - 1 )
 
-  a <- foreach::foreach(j = 1:NCOL(stage), .combine = raster::stack) %dopar% {
+  a <- foreach::foreach(j = 2:NCOL(stage), .combine = raster::stack) %dopar% {
     val.v = stage[fastmatch::fmatch(catch.v, stage$COMID), j]
     fin.v = val.v - hand.v
-    fin.v[fin.v < 0] <- NA
+    fin.v[fin.v <= 0] <- NA
     fin.v[fin.v > 0] <- 1
     f.v = matrix(fin.v, ncol = catchmentv$dim[2], byrow = T)
     f = raster::raster(f.v)
@@ -58,6 +65,8 @@ map = function(name.dir, write = TRUE){
     raster::res(f) <- catchmentv$res
     return(f)
   }
+
+  names(a) = paste0("timestep", c(1:dim(a)[3]))
 
   return(a)
 }

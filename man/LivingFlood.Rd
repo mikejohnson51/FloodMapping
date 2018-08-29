@@ -11,5 +11,5 @@
 \details{
 Generate near real-time and forecasted flood extents using the National Water Model
 
-See the README on github
+See the README on [github](https://github.com/mikejohnson51/FloodMapping)
 }

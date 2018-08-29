@@ -1,3 +1,14 @@
+#' @title Download streamflow forecasts
+#' @description Wrapper around the NWM package to download National Water Model data from the HydroShare THREDDS server
+#' @param name.dir the directory with processed geospatial data
+#' @param config the model configureation (default is 'medium_range')
+#' @param date the date of interest given as "YYYYMMDD" defaults to current date
+#' @param t the time a forcast is made (t = 1:23) defaults to most current forecast
+#' @param f the number of time period into the future (eg how many flood raster to make)
+#' @return a path to the processed data directory
+#' @export
+#' @author Mike Johnson
+
 getFlows = function(name.dir, config = 'medium_range', date = NULL, t = NULL, f = 8){
 
   `%+%` = crayon::`%+%`

@@ -11,6 +11,16 @@ sf::st_write(input, dsn = paste0(path, "/", var, ".shp"), layer = var,
 }
 
 
+#' @title Process Raw HAND Data to an AOI
+#' @description Crop, merge and filter raw HUC6 HAND products to an AOI
+#' @param AOI a list containing spatial a spatial geometry and a collection of NHD reaches
+#' @param raw.dir the path where the raw HAND data is stored
+#' @param write.path the path to write the processed data to
+#' @keywords internal
+#' @return NULL
+#' @export
+#' @author Mike Johnson
+
 processData = function(AOI = NULL, raw.dir = NULL, write.path = NULL){
 
 `%+%` = crayon::`%+%`
@@ -43,7 +53,7 @@ path = paste0(g.path, "/catchmask.tif")
 
 if(!file.exists(path)){
   mosaic.lf(input = catch.files, AOI$AOI, write.path = path)
-  cat(crayon::white("CATCHMASK data cropped and merged for", basename(write.path)))
+  cat(crayon::white("CATCHMASK data cropped and merged for", basename(write.path)), "\n")
 }
 
 ####

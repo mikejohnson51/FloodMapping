@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Find National Hydrography Data Stream Networks — findNHD • Flood Mapping</title>
+<title>Find National Hydrography Stream Networks — findNHD • Flood Mapping</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,11 @@
 
 
 
-<meta property="og:title" content="Find National Hydrography Data Stream Networks — findNHD" />
+<meta property="og:title" content="Find National Hydrography Stream Networks — findNHD" />
 
-<meta property="og:description" content="findNHD returns a list of Spatial* Objects cropped to an Area of Interest." />
+<meta property="og:description" content="findNHD returns a list of SimpleFeatures object cropped to an Area of Interest." />
+
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -110,31 +112,31 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Find National Hydrography Data Stream Networks</h1>
+    <h1>Find National Hydrography Stream Networks</h1>
     
     <div class="hidden name"><code>findNHD.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>findNHD</code> returns a list of <code>Spatial*</code> Objects cropped to an Area of Interest.<br /><br /></p>
+    <p><code>findNHD</code> returns a list of <code>SimpleFeatures</code> object cropped to an Area of Interest.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>findNHD</span>(<span class='kw'>AOI</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ids</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>findNHD</span>(<span class='kw'>AOI</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>AOI</th>
-      <td><p>If TRUE, returns a list of COMIDS for NHD reaches</p></td>
-    </tr>
-    <tr>
-      <th>ids</th>
-      <td><p>If TRUE, data is written to a HydroData folder in users working directory.</p></td>
+      <td><p>a spatial geometry to clip to</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>a list with AOI geometry and NHD feature set</p>
     
 
   </div>
@@ -142,7 +144,9 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
     <h2>Author</h2>
     

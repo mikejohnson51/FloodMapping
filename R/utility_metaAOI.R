@@ -6,8 +6,8 @@
 #' @examples
 #' \dontrun{
 #' AOI = getAOI('Colorado Springs') %>% metaAOI
-#'
 #' }
+#' @author Mike Johnson
 
 metaAOI = function(AOI){
 

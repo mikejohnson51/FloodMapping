@@ -2,7 +2,11 @@
 
 export(downloadRaw)
 export(findNHD)
-export(query_cida)
+export(getData)
+export(getFlows)
+export(map)
+export(mosaic.lf)
+export(processData)
 import(AOI)
 import(nwm)
 importFrom(crayon,"%+%")

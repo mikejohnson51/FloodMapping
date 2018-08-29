@@ -14,6 +14,7 @@
     the Height Above Nearest Drainage (HAND) products and the National Water Model. Users 
     can define their region of interest and monitor real-time flood extents or look a back     
     to past events archived by the NWM.">
+<meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -80,7 +81,8 @@
     
 <div id="flood-mapping" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#flood-mapping" class="anchor"></a>Flood Mapping</h1></div>
+<a href="#flood-mapping" class="anchor"></a>Flood Mapping <img src="reference/figures/logo.png" width="160" height="120" align="right">
+</h1></div>
 
 <p>The advent of the National Water Model and the development of the Height Above Nearest Drainage products (HAND) have provided the ability to map flood extents for anywhere in the lower 48 United States. The challenges with this methodology stem from the aquisition, managment and applciation of large scale data sets.</p>
 <p>FloodMapper is design to help users get the data they need, archive it on their local machines, and then process flood extents. In executing the steps in this process the first time the process in run the data is all collects and formated - meaning it is slow. After the intital pass though users can quickly generate flood maps for their region form realtime National Water Model output (getFlows), staged historic data (getRetro), and can adjust forecasted values to test regional sensitivites (adjust).</p>
@@ -97,7 +99,10 @@
 <a href="#installation" class="anchor"></a>Installation:</h2>
 <pre><code>install.packages("devtools")
 devtools::install_github("mikejohnson51/FloodMapper")</code></pre>
-<p>This package calls upon the <a href="https://github.com/mikejohnson51/AOI">AOI</a> and <a href="https://github.com/mikejohnson51/nwm">nwm</a> packages to forecast flood extetns using the HAND methodology.</p>
+<p>This package calls upon the <a href="https://github.com/mikejohnson51/AOI">AOI</a> and <a href="https://github.com/mikejohnson51/nwm">nwm</a> packages to forecast flood extents using the HAND methodology.</p>
+<p>The HAND datasets are a product of:</p>
+<p>Liu, Yan Y., David R. Maidment, David G. Tarboton, Xing Zheng, and Shaowen Wang. 2018. A CyberGIS Integration and Computation Framework for High-Resolution Continental-Scale Flood Inundation Mapping. Journal of the American Water Resources Association (JAWRA). Accepted.</p>
+<p>Liu, Yan Y., David R. Maidment, David G. Tarboton, Xing Zheng, Ahmet Yildirim, Nazmus S. Sazib and Shaowen Wang. 2016. A CyberGIS Approach to Generating High-resolution Height Above Nearest Drainage (HAND) Raster for National Flood Mapping. The Third International Conference on CyberGIS and Geospatial Data Science. July 26–28, 2016, Urbana, Illinois. <a href="http://dx.doi.org/10.13140/RG.2.2.24234.41925/1" class="uri">http://dx.doi.org/10.13140/RG.2.2.24234.41925/1</a></p>
 </div>
 </div>
 

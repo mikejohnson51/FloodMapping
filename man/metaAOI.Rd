@@ -18,7 +18,9 @@ Break a spatial geometry into descriptive meta data
 \examples{
 \dontrun{
 AOI = getAOI('Colorado Springs') \%>\% metaAOI
-
 }
+}
+\author{
+Mike Johnson
 }
 \keyword{internal}

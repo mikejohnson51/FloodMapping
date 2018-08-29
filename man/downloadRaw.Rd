@@ -17,7 +17,7 @@ downloadRaw(base.path, HUC6, type)
 the requested file downloaded as a GeoTIFF for RDA file
 }
 \description{
-Downlaod RAW hand data
+Function to isolate HUC6 regions of interest and download the appropriate data from the University of Texas server,
 }
 \examples{
 \dontrun{
@@ -25,5 +25,8 @@ downloadRaw(base.path = base.path, HUC6 = 180702, type = 'hand')
 downloadRaw(base.path = base.path, HUC6 = 180702, type = 'catchmask')
 downloadRaw(base.path = base.path, HUC6 = 180702, type = 'rating')
 }
-
 }
+\author{
+Mike Johnson
+}
+\keyword{internal}

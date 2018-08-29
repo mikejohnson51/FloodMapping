@@ -2,18 +2,20 @@
 % Please edit documentation in R/utility_findNHD.R
 \name{findNHD}
 \alias{findNHD}
-\title{Find National Hydrography Data Stream Networks}
+\title{Find National Hydrography Stream Networks}
 \usage{
-findNHD(AOI = NULL, ids = FALSE)
+findNHD(AOI = NULL)
 }
 \arguments{
-\item{AOI}{If TRUE, returns a list of COMIDS for NHD reaches}
-
-\item{ids}{If TRUE, data is written to a HydroData folder in users working directory.}
+\item{AOI}{a spatial geometry to clip to}
+}
+\value{
+a list with AOI geometry and NHD feature set
 }
 \description{
-\code{findNHD} returns a list of \code{Spatial*} Objects cropped to an Area of Interest.\cr\cr
+\code{findNHD} returns a list of \code{SimpleFeatures} object cropped to an Area of Interest.
 }
 \author{
 Mike Johnson
 }
+\keyword{internal}

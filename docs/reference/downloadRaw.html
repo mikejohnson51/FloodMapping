@@ -32,7 +32,9 @@
 
 <meta property="og:title" content="Downlaod RAW hand data — downloadRaw" />
 
-<meta property="og:description" content="Downlaod RAW hand data" />
+<meta property="og:description" content="Function to isolate HUC6 regions of interest and download the appropriate data from the University of Texas server," />
+
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -117,7 +119,7 @@
 
     <div class="ref-description">
     
-    <p>Downlaod RAW hand data</p>
+    <p>Function to isolate HUC6 regions of interest and download the appropriate data from the University of Texas server,</p>
     
     </div>
 
@@ -146,15 +148,11 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>\downtrun{
-downloadRaw(base.path = base.path, HUC6 = 180702, type = 'hand')
-downloadRaw(base.path = base.path, HUC6 = 180702, type = 'catchmask')
-downloadRaw(base.path = base.path, HUC6 = 180702, type = 'rating')
-}
-
-</div><div class='output co'>#&gt; <span class='error'>Error: &lt;text&gt;:1:1: unexpected input</span>
-#&gt; <span class='error'>1: \</span>
-#&gt; <span class='error'>    ^</span></div></pre>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='fu'>downloadRaw</span>(<span class='kw'>base.path</span> <span class='kw'>=</span> <span class='no'>base.path</span>, <span class='kw'>HUC6</span> <span class='kw'>=</span> <span class='fl'>180702</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>'hand'</span>)
+<span class='fu'>downloadRaw</span>(<span class='kw'>base.path</span> <span class='kw'>=</span> <span class='no'>base.path</span>, <span class='kw'>HUC6</span> <span class='kw'>=</span> <span class='fl'>180702</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>'catchmask'</span>)
+<span class='fu'>downloadRaw</span>(<span class='kw'>base.path</span> <span class='kw'>=</span> <span class='no'>base.path</span>, <span class='kw'>HUC6</span> <span class='kw'>=</span> <span class='fl'>180702</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>'rating'</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -165,6 +163,10 @@ downloadRaw(base.path = base.path, HUC6 = 180702, type = 'rating')
       
       <li><a href="#examples">Examples</a></li>
     </ul>
+
+    <h2>Author</h2>
+    
+Mike Johnson
 
   </div>
 </div>

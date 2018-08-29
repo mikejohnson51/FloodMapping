@@ -1,3 +1,13 @@
+#' @title Crop and merge and write raster sets
+#' @description Crop and merge datasets that cross HUC6 boundaries
+#' @param input a raster stack
+#' @param bb a bounding box to crop to
+#' @param write.path a path to write processed data
+#' @keywords internal
+#' @return NULL
+#' @export
+#' @author Mike Johnson
+
 mosaic.lf = function(input, bb, write.path){
 
   s = list()
