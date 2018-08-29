@@ -1,68 +1,68 @@
+.write.shp = function(input = NULL, path, var = NULL){
+
+if(!grepl('sf', class(input))){ input = sf::st_as_sf(input)}
+if(var == 'nhdflowlines'){ names(input) <- make.names(names(input), unique = TRUE) }
+
+suppressWarnings(
+sf::st_write(input, dsn = paste0(path, "/", var, ".shp"), layer = var,
+               driver = "ESRI Shapefile", delete_dsn = TRUE, quiet = TRUE)
+)
+
+}
+
+
 processData = function(AOI = NULL, raw.dir = NULL, write.path = NULL){
+
+`%+%` = crayon::`%+%`
 
 h.path = paste0(write.path, "/hydro")
 g.path = paste0(write.path, "/geo")
 
-if(!dir.exists(h.path)){ dir.create(h.path)}
-if(!dir.exists(g.path)){ dir.create(g.path)}
+.create.dir(write.path, folders = c('hydro', 'geo'))
 
-bb = AOI$AOI
 comids = AOI$nhd$comid
-huc6 = substr(AOI$nhd$reachcode, 1, 6)
-names(AOI$nhd) <- make.names(names(AOI$nhd), unique = TRUE)
+huc6 = unique(substr(AOI$nhd$reachcode, 1, 6))
 
-suppressWarnings({
+.write.shp(AOI$AOI, g.path, "AOI")
+.write.shp(AOI$nhd, g.path, "nhdflowlines")
 
-if(!file.exists(paste0(g.path, "/AOI.shp"))){
-sf::st_write(sf::st_as_sf(bb), dsn = paste0(g.path, "/AOI.shp"), layer = "AOI",
-               driver = "ESRI Shapefile", delete_dsn = TRUE, quiet = TRUE)
-}
-
-if(!file.exists(paste0(g.path, "/nhdflowlines.shp"))){
-sf::st_write(sf::st_as_sf(AOI$nhd), dsn = paste0(g.path, "/nhdflowlines.shp"), layer = "nhd",
-               driver = "ESRI Shapefile", delete_dsn = TRUE, quiet = TRUE)
-}
-
-})
-
-toMatch = paste(huc6,collapse="|")
-
-all.files = list.files(raw.dir, toMatch, full.names = TRUE, recursive = TRUE)
+all.files = list.files(raw.dir, paste(huc6,collapse="|"), full.names = TRUE, recursive = TRUE)
 
 ####
 
 hand.files = all.files[grepl("hand", all.files)]
-  path = paste0(g.path, "/hand.tif")
+path = paste0(g.path, "/hand.tif")
 
 if(!file.exists(path)){
-  mosaic.lf(input = hand.files, bb, write.path = path)
+  mosaic.lf(input = hand.files, AOI$AOI, write.path = path)
+  cat(crayon::white("HAND data cropped and merged for", basename(write.path)), "\n")
 }
-
-message("`HAND` data processed")
-####
 
 catch.files = all.files[grepl("catch", all.files)]
-  path = paste0(g.path, "/catchmask.tif")
+path = paste0(g.path, "/catchmask.tif")
 
 if(!file.exists(path)){
-  mosaic.lf(input = catch.files, bb, write.path = path)
+  mosaic.lf(input = catch.files, AOI$AOI, write.path = path)
+  cat(crayon::white("CATCHMASK data cropped and merged for", basename(write.path)))
 }
-
-message("`Catchmask` data processed")
 
 ####
 rating.files = all.files[grepl("rating", all.files)]
-  path = paste0(h.path, "/ratings_curves.rda")
+path = paste0(h.path, "/ratings_curves.rda")
+
+if(!file.exists(path)){
 
 rc = list()
+ratings = NULL #Avoid global param before load
+
 for(k in seq_along(rating.files)){
-  load(rating.files[1])
+  load(rating.files[k])
   rc[[k]] = ratings[ratings$CatchId %in% comids,]
 }
 
 rating_curves = do.call(rbind, rc)
 save(rating_curves, file = path, compress = 'xz')
 
-message("`Rating Curve` data processed")
-
+cat(crayon::white("Rating curve data filtered and saved for", basename(write.path), "\n"))
+}
 }

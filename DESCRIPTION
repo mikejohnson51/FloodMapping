@@ -14,12 +14,21 @@ Depends:
     AOI,
     nwm
 Imports:
-    curl,
+    crayon,
     data.table,
+    doParallel,
+    fastmatch,
+    foreach,
+    httr,
+    parallel,
     raster,
-    magrittr,
     sf,
-    utils
+    stats,
+    utils,
+    velox
+Remotes: mikejohnson51/AOI,
+         mikejohnson51/nwm
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
+

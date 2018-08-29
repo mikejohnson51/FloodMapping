@@ -1,0 +1,24 @@
+title: Flood Mapping
+template:
+  params:
+    bootswatch: flatly
+reference:
+  - title: Core Functions
+    desc: ~
+      Functions for flood mapping
+    contents:
+      - '`getData`'
+      - '`getFlows`'
+      - '`map`'
+navbar:
+  left:
+    - icon: fa-home
+      href: index.html
+    - text: "Documentation"
+      icon: fas fa-book
+      menu:
+      -  text: Getting Started
+         href: articles/index.html
+    - icon: fa-file-code-o
+      text: "functions"
+      href: reference/index.html

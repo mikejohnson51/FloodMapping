@@ -11,9 +11,6 @@ mosaic.lf = function(input, bb, write.path){
 
     if(!is.null(raster::intersect(raster::extent(dat),raster::extent(bb)))){
       s[[paste0("raster", i)]] <- raster::crop(dat, bb, snap = "out")
-      message("Raster Cropped.")
-    } else {
-      message("Raster not needed")
     }
   }
 

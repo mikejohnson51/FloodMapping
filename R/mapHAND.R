@@ -1,4 +1,0 @@
-mapHAND = function(AOI = NULL){
-
-
-}
