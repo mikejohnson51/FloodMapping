@@ -1,0 +1,130 @@
+---
+title: "NWM tests"
+vignette: |
+  %\VignetteIndexEntry{pkgdown} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6, 
+  fig.height = 4
+)
+
+library(nwm)
+library(rasterVis)
+```
+
+# Define the AOI
+
+Lets define the AOI:
+
+```{r}
+
+#Define AOI
+AOI = getAOI(list("Colorado Springs", 15, 15))
+
+#Get some flowlines
+nhd = getNHD(AOI)
+
+# Visualize
+AOI::check(AOI) %>% addPolylines(data = nhd, popup = paste0("COMID: ", nhd$comid), weight  = nhd$streamorde)
+
+# Describe contexts
+AOI %>% describe()
+```
+
+
+# Channel Output Example
+
+```{r}
+xx = system.time({
+
+filelist = getFilelist(config = "medium_range",
+                     date = "20180823",
+                     type = "channel",
+                     t =  c(0),
+                     f = seq(3,33,3))
+
+flows <- nwm::downloadNWM(AOI, filelist, param = "streamflow")
+})
+```
+
+```{r, echo = F}
+                   
+message(dim(flows$streamflow)[1], " streamflow records extracted in ", round(xx[3], 2), " seconds")
+
+head(flows$streamflow, 5)
+
+```
+
+
+```{r}
+
+data = flows$streamflow
+reach1 = unique(data$COMIDS)[1]
+data_sub = data[data$COMIDS == reach1,]
+
+plot(x = data_sub$DateTime, y = data_sub$streamflow, type = 'b',
+      main = "National Water Model: Streamflow",
+      xlab = "dateTime - UTC", 
+      ylab = "Streamflow (cfs)")
+```
+
+
+# Land output example 
+
+```{r}
+xx = system.time({
+  
+  filelist = getFilelist(config = "medium_range",
+                         date = "20180823",
+                         type = "land",
+                         t =  c(0),
+                         f = seq(3,33,3))
+  
+  et <- nwm::downloadNWM(AOI, filelist, param = "accet")
+})
+```
+
+```{r, echo = F}
+message(dim(et$accet)[3], " ",  dim(et$accet)[1] *dim(et$accet)[2],  " km2 land rasters extracted in ", round(xx[3], 2), " seconds")
+```
+
+```{r}
+data = et$accet[[1:4]]
+
+rasterVis::levelplot(data, main = "National Water Model: Accumulated ET", 
+                     names.attr = as.character(nwm::getGridTime(data)))
+```
+
+# Forcing Examples
+
+```{r}
+xx = system.time({
+  
+  filelist = getFilelist(config = "medium_range",
+                         date = "20180823",
+                         type = "forcing",
+                         t =  c(0),
+                         f = seq(3,33,3))
+  
+  prcp <- nwm::downloadNWM(AOI, filelist, param = "rainrate")
+})
+```
+
+```{r, echo = F}
+message(dim(prcp$rainrate)[3], " ",  dim(prcp$rainrate)[1] *dim(prcp$rainrate)[2],  " km2 land rasters extracted in ", round(xx[3], 2), " seconds")
+```
+
+```{r}
+data = prcp$rainrate[[1:4]]
+
+rasterVis::levelplot(data, main = "National Water Model: Rainrate", 
+                     names.attr = as.character(nwm::getGridTime(data)))
+```
+
+

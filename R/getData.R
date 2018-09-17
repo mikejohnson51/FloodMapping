@@ -7,7 +7,7 @@
 #' @export
 #' @author Mike Johnson
 
-getData = function(AOI = NULL, name = NULL, write.path = NULL){
+getData = function(AOI = NULL, name = NULL, read.path = NULL, write.path = NULL){
 
   `%+%` = crayon::`%+%`
 
@@ -21,6 +21,9 @@ getData = function(AOI = NULL, name = NULL, write.path = NULL){
   }
 
   raw.dir = paste0(main.dir, "/RAW")
+
+  if(is.null(read.path)){ read.path = raw.dir }
+
   name.dir = paste0(main.dir, "/", name)
   meta.path = paste0(main.dir, "/meta_data.csv")
 
@@ -51,7 +54,18 @@ getData = function(AOI = NULL, name = NULL, write.path = NULL){
       name.dir = paste0(main.dir, "/", name)
     } else {if(!dir.exists(name.dir)){dir.create(name.dir)}}
 
-    for(j in 1:length(HUC6)){
+
+  if( raw.dir != read.path ){
+    for(k in 1:length(HUC6)){
+      all.files = list.files(read.path, recursive = T, full.names = T, pattern = HUC6[k])
+    for(t in c("hand", "catchmask", "rating")){
+        file = all.files[grepl(t, all.files)]
+        file.copy(file, paste0(raw.dir, "/", t, "/", basename(file)))
+    }
+    }
+  }
+
+   for(j in 1:length(HUC6)){
       downloadRaw(base.path = raw.dir, HUC6 = HUC6[j], type =  "hand")
       downloadRaw(base.path = raw.dir, HUC6 = HUC6[j], type =  "catchmask")
       downloadRaw(base.path = raw.dir, HUC6 = HUC6[j], type =  "rating")

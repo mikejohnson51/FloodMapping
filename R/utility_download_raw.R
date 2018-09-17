@@ -44,6 +44,8 @@
 #' downloadRaw(base.path = base.path, HUC6 = 180702, type = 'catchmask')
 #' downloadRaw(base.path = base.path, HUC6 = 180702, type = 'rating')
 #' }
+
+
 downloadRaw = function(base.path, HUC6, type){
 
    .create.dir(base.path = base.path)
@@ -68,6 +70,7 @@ downloadRaw = function(base.path, HUC6, type){
     if (!file.exists(tmp)) {
         cat(crayon::white(paste0("Downloading ", toupper(type), " data (", i, "/", length(HUC6), "): ")) %+% crayon::yellow(basename(url)), "\n")
         ratings <-  data.table::fread(url, select = c("CatchId", "Stage", 'Discharge (m3s-1)'), showProgress = FALSE)
+        ratings <- data.frame(ratings)
         save(ratings, file = tmp, compress = 'xz')
         rm(ratings)
         cat(crayon::white(paste0(toupper(type), " data (", i, "/", length(HUC6), ") saved to: ")) %+% crayon::green(basename(tmp), "\n"))

@@ -8,7 +8,7 @@
 #' @export
 #' @author Mike Johnson
 
-mosaic.lf = function(input, bb, write.path){
+mosaic.lf = function(input, bb){
 
   s = list()
 
@@ -36,5 +36,8 @@ mosaic.lf = function(input, bb, write.path){
   } else {
     mos = s[[1]]
   }
-  raster::writeRaster(mos, filename = write.path, format="GTiff", overwrite=TRUE, options="COMPRESS=LZW")
+
+  #raster::writeRaster(mos, filename = write.path, format="GTiff", overwrite=TRUE, options="COMPRESS=LZW")
+
+  return(mos)
 }

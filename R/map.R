@@ -14,7 +14,8 @@ map = function(name.dir, write = TRUE){
   all.files = list.files(name.dir, recursive = T, full.names = TRUE)
 
   load(all.files[grepl("flows.rda", all.files)])
-  load(all.files[grepl("ratings_curves.rda", all.files)])
+  load(all.files[grepl("rating.rda", all.files)])
+
   catchmentv = velox::velox(all.files[grepl("catchmask.tif", all.files)])
   handv = velox::velox(all.files[grepl("hand.tif", all.files)])
 
@@ -36,7 +37,7 @@ map = function(name.dir, write = TRUE){
     fin = NULL
 
     for(j in 2:dim(flow)[2]){
-      tmp = curve$Stage[which.min(abs(curve$`Discharge (m3s-1)` - flow[1,j]))]
+      tmp = curve$Stage[which.min(abs(curve$`Discharge..m3s.1.` - flow[1,j]))]
       if(length(tmp) <= 0){ tmp = NA }
       fin = append(tmp, fin)
     }
@@ -71,4 +72,7 @@ map = function(name.dir, write = TRUE){
   return(a)
 }
 
+length(fin.v)
+length(val.v)
+length(catch.v)
 

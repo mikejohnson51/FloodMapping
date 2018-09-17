@@ -41,24 +41,31 @@ all.files = list.files(raw.dir, paste(huc6,collapse="|"), full.names = TRUE, rec
 ####
 
 hand.files = all.files[grepl("hand", all.files)]
-path = paste0(g.path, "/hand.tif")
+hand.path = paste0(g.path, "/hand.tif")
 
-if(!file.exists(path)){
-  mosaic.lf(input = hand.files, AOI$AOI, write.path = path)
+if(!file.exists(hand.path)){
+  h = mosaic.lf(input = hand.files, AOI$AOI)
   cat(crayon::white("HAND data cropped and merged for", basename(write.path)), "\n")
+
 }
 
 catch.files = all.files[grepl("catch", all.files)]
-path = paste0(g.path, "/catchmask.tif")
+catch.path = paste0(g.path, "/catchmask.tif")
 
-if(!file.exists(path)){
-  mosaic.lf(input = catch.files, AOI$AOI, write.path = path)
+if(!file.exists(catch.path)){
+  c = mosaic.lf(input = catch.files, AOI$AOI)
   cat(crayon::white("CATCHMASK data cropped and merged for", basename(write.path)), "\n")
 }
 
+c = raster::crop(c,h)
+h = raster::crop(h,c)
+
+raster::writeRaster(c, filename = catch.path, format="GTiff", overwrite=TRUE, options="COMPRESS=LZW")
+raster::writeRaster(h, filename = hand.path, format="GTiff", overwrite=TRUE, options="COMPRESS=LZW")
+
 ####
 rating.files = all.files[grepl("rating", all.files)]
-path = paste0(h.path, "/ratings_curves.rda")
+path = paste0(h.path, "/rating.rda")
 
 if(!file.exists(path)){
 
