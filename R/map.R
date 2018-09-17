@@ -72,7 +72,3 @@ map = function(name.dir, write = TRUE){
   return(a)
 }
 
-length(fin.v)
-length(val.v)
-length(catch.v)
-
