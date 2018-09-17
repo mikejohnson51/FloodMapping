@@ -12,12 +12,12 @@ mosaic.lf = function(input, bb){
 
   s = list()
 
-  if(grepl('Spatial', class(bb))){ bb = sf::st_as_sf(bb)}
+  if(grepl('Spatial', class(bb))){ bb = sf::st_as_sf(bb) }
 
   for(i in seq_along(input)){
     dat <- raster::raster(input[i])
 
-    bb = sf::as_Spatial(sf::st_transform(bb, as.character(dat@crs)))
+    bb = sf::st_transform(bb, as.character(dat@crs))
 
     if(!is.null(raster::intersect(raster::extent(dat),raster::extent(bb)))){
       s[[paste0("raster", i)]] <- raster::crop(dat, bb, snap = "out")
@@ -36,8 +36,6 @@ mosaic.lf = function(input, bb){
   } else {
     mos = s[[1]]
   }
-
-  #raster::writeRaster(mos, filename = write.path, format="GTiff", overwrite=TRUE, options="COMPRESS=LZW")
 
   return(mos)
 }

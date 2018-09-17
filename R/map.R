@@ -6,7 +6,7 @@
 #' @export
 #' @author Mike Johnson
 
-map = function(name.dir, write = TRUE){
+map = function(name.dir, write = TRUE, add = 0){
 
   j = NULL
   `%dopar%` = foreach::`%dopar%`
@@ -32,7 +32,7 @@ map = function(name.dir, write = TRUE){
   stage = NULL
 
   for(i in seq_along(comids)){
-    flow = flows[flows$COMIDS == comids[i],]
+    flow = flows[flows$COMIDS == comids[i],] + add
     curve = rating_curves[rating_curves$CatchId == comids[i],]
     fin = NULL
 
@@ -58,7 +58,7 @@ map = function(name.dir, write = TRUE){
     val.v = stage[fastmatch::fmatch(catch.v, stage$COMID), j]
     fin.v = val.v - hand.v
     fin.v[fin.v <= 0] <- NA
-    fin.v[fin.v > 0] <- 1
+    #fin.v[fin.v > 0] <- 1
     f.v = matrix(fin.v, ncol = catchmentv$dim[2], byrow = T)
     f = raster::raster(f.v)
     raster::extent(f) <- catchmentv$extent
