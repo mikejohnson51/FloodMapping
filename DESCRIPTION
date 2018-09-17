@@ -1,11 +1,11 @@
-Package: LivingFlood
+Package: FloodMapping
 Title: Map Flood extents using HAND and the National Water Model
 Version: 0.0.0.9000
 Authors@R: person("Mike", "Johnson", role = c("aut", "cre"), email = "mike.johnson@geog.ucsb.edu")
-Maintainer: Mike Johnson <mike.johnson@geog.ucsb.edu>
+Maintainer: Mike Johnson <jmj00@ucdb.com>
 BugReports: https://github.com/mikejohnson51/nwm/issues
 Description: This package aggregates the needed data to map flood extents using 
-    the Height Above Nearest Drainage (HAND) products and the National Water Model. Users 
+    the Height Above Nearest Drainage (HAND) products and the National Water Model forecasts. Users 
     can define their region of interest and monitor real-time flood extents or look a back     
     to past events archived by the NWM.
 Encoding: UTF-8
