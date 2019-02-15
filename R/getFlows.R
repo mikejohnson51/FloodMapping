@@ -3,12 +3,14 @@
 #' @param name.dir the directory with processed geospatial data
 #' @param config the model configureation (default is 'medium_range')
 #' @param date the date of interest given as "YYYYMMDD" defaults to current date
-#' @param f the number of time period into the future (eg how many flood raster to make)
+#' @param t time of forecast
+#' @param f hours foward from t
+#' @param n if f is null n can be used to limit the number of files returned
 #' @return a path to the processed data directory
 #' @export
 #' @author Mike Johnson
 
-getFlows = function(name.dir, config = 'medium_range', date = NULL,  f = 3){
+getFlows = function(name.dir, config = 'medium_range', startDate = NULL,  t  = NULL, f = NULL, n = NULL){
 
   `%+%` = crayon::`%+%`
 
@@ -16,7 +18,7 @@ getFlows = function(name.dir, config = 'medium_range', date = NULL,  f = 3){
 
   f = as.numeric(gsub("f", "", eval(parse(text = paste0("nwm::nwm$", config, "$meta$flist")))))[1:f]
 
-  filelist = nwm::getFilelist(config, type = 'channel', date, f = f)
+  filelist = nwm::getFilelist(config, type = 'channel', startDate, t = t, f = f, n = n)
 
   cat(crayon::white(paste0("Downloading flow data for ", length(filelist), " timesteps\n")))
 
