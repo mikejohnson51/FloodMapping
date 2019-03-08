@@ -1,6 +1,7 @@
 # Flood Mapping <img src="man/figures/logo.png" width=160 height = 120 align="right"/>
 
 [![Build Status](https://travis-ci.org/mikejohnson51/FloodMapping.svg?branch=master)](https://travis-ci.org/mikejohnson51/FloodMapping)
+[![DOI](https://zenodo.org/badge/130427796.svg)](https://zenodo.org/badge/latestdoi/130427796)
 
 The advent of the National Water Model and the development of the Height Above Nearest Drainage products (HAND) offer the ability to map flood extents for anywhere in the lower 48 United States. The challenges with this methodology stem from the acquisition, management and application of large scale data sets. 
 
