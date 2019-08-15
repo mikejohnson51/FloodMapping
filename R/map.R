@@ -2,6 +2,7 @@
 #' @description This function takes a folder of processed data and generates a HAND inudation raster for each timestep
 #' @param name.dir the directory where processed data is stored
 #' @param write logical. Should output rasters be written to disk (default = TRUE)
+#' @param add numeric. A uniform depth to add to simulated inudation
 #' @return a raster stack of innudation maps
 #' @export
 #' @author Mike Johnson

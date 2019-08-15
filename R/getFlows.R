@@ -2,7 +2,7 @@
 #' @description Wrapper around the NWM package to download National Water Model data from the HydroShare THREDDS server
 #' @param name.dir the directory with processed geospatial data
 #' @param config the model configureation (default is 'medium_range')
-#' @param date the date of interest given as "YYYYMMDD" defaults to current date
+#' @param startDate the date of interest given as "YYYYMMDD" defaults to current date
 #' @param t time of forecast
 #' @param f hours foward from t
 #' @param n if f is null n can be used to limit the number of files returned

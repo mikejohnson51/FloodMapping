@@ -14,15 +14,16 @@
 #' @import nwm
 #' @importFrom crayon white red yellow cyan %+%
 #' @importFrom data.table fread
+#' @importFrom jsonlite fromJSON
 #' @importFrom doParallel registerDoParallel
 #' @importFrom fastmatch fmatch
 #' @importFrom foreach %dopar% foreach
-#' @importFrom httr GET progress write_disk
+#' @importFrom httr GET POST progress write_disk RETRY
 #' @importFrom parallel detectCores
 #' @importFrom raster raster merge extent intersect crop crs writeRaster
 #' @importFrom sf read_sf write_sf as_Spatial st_transform st_as_sf
 #' @importFrom stats reshape
-#' @importFrom utils read.csv write.csv globalVariables
+#' @importFrom utils read.csv write.csv globalVariables unzip
 #' @importFrom velox velox
 
 NULL

@@ -11,14 +11,16 @@
 
 metaAOI = function(AOI){
 
-  latCent = mean(AOI@bbox[2,])
+  bb = bbox_st(AOI)
+
+  latCent = sum(bb$ymin, bb$ymax) / 2
 
   return(
    list(
       latCent = latCent,
-      lngCent = mean(AOI@bbox[1,]),
-      height  = round(69 * (abs(AOI@bbox[2,1] - AOI@bbox[2,2])), 0),
-      width   = round(69 * cos(latCent * pi/180)*(abs(AOI@bbox[1,1] - AOI@bbox[1,2])), 0),
+      lngCent = sum(bb$xmin, bb$xmax) / 2,
+      height  = round(69 * (abs(bb$ymin - bb$ymax)), 0),
+      width   = round(69 * cos(latCent * pi/180)*(abs(bb$xmin - bb$xmax)), 0),
       origin  = "center"
      )
    )

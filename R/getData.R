@@ -2,7 +2,8 @@
 #' @description Download raw HAND, catchment and rating curve file and crop to an area of interest
 #' @param AOI a spatial geometery to subset with
 #' @param name the name of the region your are studying (default will be RegionXXX)
-#' @param write.path the path to write main LIVINGFLOOD directory. Deafult will be the users working directory.
+#' @param write.path the path to write main LIVINGFLOOD directory. Default will be the users working directory.
+#' @param read.path a path to look for existing HAND data
 #' @return the path the the directory storing processed data
 #' @export
 #' @author Mike Johnson
@@ -30,10 +31,11 @@ getData = function(AOI = NULL, name = NULL, read.path = NULL, write.path = NULL)
   .create.dir(main.dir, folders = NULL)
   .create.dir(raw.dir, folders = NULL)
 
-  AOI  = AOI %>% findNHD()
-  HUC6 = unique(substr(AOI$nhd$reachcode,1,6))
+  nhd  = findNHD(AOI)
 
-  meta = data.frame(name = name, metaAOI(AOI$AOI), HUC6 = HUC6, nhd_num = length(AOI$nhd), stringsAsFactors = FALSE)
+  HUC6 = unique(substr(nhd$reachcode,1,6))
+
+  meta = data.frame(name = name, metaAOI(AOI), HUC6 = HUC6, nhd_num = NROW(nhd), stringsAsFactors = FALSE)
 
   if(!file.exists(meta.path)){
     write.csv(meta, meta.path, row.names = FALSE)
@@ -50,8 +52,10 @@ getData = function(AOI = NULL, name = NULL, read.path = NULL, write.path = NULL)
 
     if(sum(d) > 0){
       cat(crayon::white(paste0("\nThis region has already been processed under the name `", n, "`:")) %+% crayon::green(paste0(" renaming directory `", name, "`\n\n")))
-      file.rename(paste0(main.dir, "/", n), paste0(main.dir, "/", name))
-      name.dir = paste0(main.dir, "/", name)
+      suppressWarnings(
+        file.rename(paste0(main.dir, "/", n, "/"), paste0(main.dir, "/", name, "/"))
+      )
+        ame.dir = paste0(main.dir, "/", name)
     } else {if(!dir.exists(name.dir)){dir.create(name.dir)}}
 
 

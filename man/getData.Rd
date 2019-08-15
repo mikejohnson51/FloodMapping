@@ -4,14 +4,17 @@
 \alias{getData}
 \title{Get HAND data for an AOI}
 \usage{
-getData(AOI = NULL, name = NULL, write.path = NULL)
+getData(AOI = NULL, name = NULL, read.path = NULL,
+  write.path = NULL)
 }
 \arguments{
 \item{AOI}{a spatial geometery to subset with}
 
 \item{name}{the name of the region your are studying (default will be RegionXXX)}
 
-\item{write.path}{the path to write main LIVINGFLOOD directory. Deafult will be the users working directory.}
+\item{read.path}{a path to look for existing HAND data}
+
+\item{write.path}{the path to write main LIVINGFLOOD directory. Default will be the users working directory.}
 }
 \value{
 the path the the directory storing processed data

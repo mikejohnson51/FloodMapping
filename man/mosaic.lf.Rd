@@ -4,7 +4,7 @@
 \alias{mosaic.lf}
 \title{Crop and merge and write raster sets}
 \usage{
-mosaic.lf(input, bb, write.path)
+mosaic.lf(input, bb)
 }
 \arguments{
 \item{input}{a raster stack}

@@ -19,6 +19,7 @@ Imports:
     doParallel,
     fastmatch,
     foreach,
+    jsonlite,
     httr,
     parallel,
     raster,
@@ -30,5 +31,4 @@ Remotes: mikejohnson51/AOI,
          mikejohnson51/nwm
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 6.1.0
-
+RoxygenNote: 6.1.1

@@ -44,26 +44,25 @@ hand.files = all.files[grepl("hand", all.files)]
 hand.path = paste0(g.path, "/hand.tif")
 
 if(!file.exists(hand.path)){
-  h = mosaic.lf(input = hand.files, bb = AOI$AOI)
+  h = mosaic.lf(input = hand.files, bb = AOI$nhd)
   cat(crayon::white("HAND data cropped and merged for", basename(write.path)), "\n")
 }
-
 
 catch.files = all.files[grepl("catch", all.files)]
 catch.path = paste0(g.path, "/catchmask.tif")
 
 if(!file.exists(catch.path)){
-  c = mosaic.lf(input = catch.files, bb = AOI$AOI)
+  c = mosaic.lf(input = catch.files, bb = AOI$nhd)
   cat(crayon::white("CATCHMASK data cropped and merged for", basename(write.path)), "\n")
 }
 
 
 if(!file.exists(catch.path)){
-    c = raster::crop(c, h)
-    h = raster::crop(h, c)
+    c = raster::crop(c, h, snap = 'out')
+    h = raster::crop(h, c, snap = 'out')
 
-    raster::writeRaster(c, filename = catch.path, format="GTiff", overwrite = TRUE, options="COMPRESS=LZW")
-    raster::writeRaster(h, filename = hand.path,  format="GTiff", overwrite = TRUE, options="COMPRESS=LZW")
+    raster::writeRaster(c, filename = catch.path, format="GTiff", overwrite = TRUE, options=c('TFW=YES', "COMPRESS=LZW"))
+    raster::writeRaster(h, filename = hand.path,  format="GTiff", overwrite = TRUE, options=c('TFW=YES', "COMPRESS=LZW"))
 }
 
 ####

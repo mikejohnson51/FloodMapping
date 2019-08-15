@@ -4,12 +4,14 @@
 \alias{map}
 \title{Map flood extents from processed data}
 \usage{
-map(name.dir, write = TRUE)
+map(name.dir, write = TRUE, add = 0)
 }
 \arguments{
 \item{name.dir}{the directory where processed data is stored}
 
 \item{write}{logical. Should output rasters be written to disk (default = TRUE)}
+
+\item{add}{numeric. A uniform depth to add to simulated inudation}
 }
 \value{
 a raster stack of innudation maps
