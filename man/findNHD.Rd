@@ -19,7 +19,7 @@ findNHD(AOI = NULL, comid = NULL, nwis = NULL, streamorder = NULL,
 \item{name}{Seach for NHD by GNIS name}
 }
 \value{
-an sf nhd object
+a list() of minimum length 2: AOI and nhd
 }
 \description{
 \code{findNHD} returns a \code{SpatialLinesDataframe} of all NHDFlowlines reaches within an AOI.

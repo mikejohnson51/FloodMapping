@@ -1,6 +1,6 @@
 .write.shp = function(input = NULL, path, var = NULL){
 
-if(!grepl('sf', class(input))){ input = sf::st_as_sf(input)}
+if(checkClass(input, "sf")){ input = sf::st_as_sf(input)}
 if(var == 'nhdflowlines'){ names(input) <- make.names(names(input), unique = TRUE) }
 
 suppressWarnings(
@@ -43,36 +43,30 @@ all.files = list.files(raw.dir, paste(huc6,collapse="|"), full.names = TRUE, rec
 hand.files = all.files[grepl("hand", all.files)]
 hand.path = paste0(g.path, "/hand.tif")
 
-if(!file.exists(hand.path)){
-  h = mosaic.lf(input = hand.files, bb = AOI$nhd)
-  cat(crayon::white("HAND data cropped and merged for", basename(write.path)), "\n")
-}
+if(!file.exists(hand.path)){ h = mosaic.lf(input = hand.files) }
+cat(crayon::white("HAND data cropped and merged for", basename(write.path)), "\n")
 
 catch.files = all.files[grepl("catch", all.files)]
 catch.path = paste0(g.path, "/catchmask.tif")
 
-if(!file.exists(catch.path)){
-  c = mosaic.lf(input = catch.files, bb = AOI$nhd)
-  cat(crayon::white("CATCHMASK data cropped and merged for", basename(write.path)), "\n")
-}
-
+if(!file.exists(catch.path)){ c = mosaic.lf(input = catch.files) }
+cat(crayon::white("CATCHMASK data cropped and merged for", basename(write.path)), "\n")
 
 if(!file.exists(catch.path)){
     c = raster::crop(c, h, snap = 'out')
     h = raster::crop(h, c, snap = 'out')
-
     raster::writeRaster(c, filename = catch.path, format="GTiff", overwrite = TRUE, options=c('TFW=YES', "COMPRESS=LZW"))
     raster::writeRaster(h, filename = hand.path,  format="GTiff", overwrite = TRUE, options=c('TFW=YES', "COMPRESS=LZW"))
 }
 
 ####
 rating.files = all.files[grepl("rating", all.files)]
-path = paste0(h.path, "/rating.rda")
+rating.path = paste0(h.path, "/rating.rda")
 
-if(!file.exists(path)){
+if(!file.exists(rating.path)){
 
 rc = list()
-ratings = NULL #Avoid global param before load
+ratings = NULL # Avoid global param before load
 
 for(k in seq_along(rating.files)){
   load(rating.files[k])
@@ -80,8 +74,8 @@ for(k in seq_along(rating.files)){
 }
 
 rating_curves = do.call(rbind, rc)
-save(rating_curves, file = path, compress = 'xz')
-
-cat(crayon::white("Rating curve data filtered and saved for", basename(write.path), "\n"))
+save(rating_curves, file = rating.path, compress = 'xz')
 }
+cat(crayon::white("Rating curve data filtered and saved for", basename(write.path), "\n"))
+
 }

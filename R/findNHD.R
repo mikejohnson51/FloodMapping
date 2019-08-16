@@ -19,7 +19,7 @@
 #' @param nwis Search for NHD features by NWIS ID
 #' @param streamorder filter returned NHD by steamorder. Returns are feature of input and higher.
 #' @param name Seach for NHD by GNIS name
-#' @return an sf nhd object
+#' @return a list() of minimum length 2: AOI and nhd
 #' @examples
 #' \dontrun{
 #' nhd  = getAOI(clip = list("Tuscaloosa, AL", 10, 10)) %>% findNHD()
@@ -28,6 +28,8 @@
 #' @export
 
 findNHD = function(AOI = NULL, comid = NULL, nwis = NULL, streamorder = NULL, name = NULL) {
+
+  if(!checkClass(AOI, "list")){AOI = list(AOI = AOI)}
 
   substrRight <- function(x, n){ substr(x, nchar(x)-n+1, nchar(x)) }
 
@@ -55,10 +57,8 @@ findNHD = function(AOI = NULL, comid = NULL, nwis = NULL, streamorder = NULL, na
                '<ogc:PropertyIsGreaterThan>',
                '<ogc:PropertyName>streamorde</ogc:PropertyName>',
                '<ogc:Literal>',streamorder - 1,'</ogc:Literal>',
-               '</ogc:PropertyIsGreaterThan>'
-               )
+               '</ogc:PropertyIsGreaterThan>')
   }
-
 
   if(!is.null(comid)){
     siteText <- ""
@@ -67,12 +67,9 @@ findNHD = function(AOI = NULL, comid = NULL, nwis = NULL, streamorder = NULL, na
       siteText <- paste0(siteText,'<ogc:PropertyIsEqualTo  matchCase="true">',
                          '<ogc:PropertyName>comid</ogc:PropertyName>',
                          '<ogc:Literal>',i,'</ogc:Literal>',
-                         '</ogc:PropertyIsEqualTo>')
-    }
+                         '</ogc:PropertyIsEqualTo>')}
 
-    f = paste0('<ogc:Or>',
-               siteText,
-               '</ogc:Or>')
+    f = paste0('<ogc:Or>', siteText, '</ogc:Or>')
   }
 
   if(!is.null(name)){
@@ -82,7 +79,14 @@ findNHD = function(AOI = NULL, comid = NULL, nwis = NULL, streamorder = NULL, na
                '</ogc:PropertyIsEqualTo>')
   }
 
-  sl = query_cida(AOI = AOI, type = 'nhd', filter  = f, spatial = F)
+  sl = query_cida(AOI = AOI$AOI, type = 'nhd', filter  = f)
 
-  sl
+  if(!is.null(df)) { sl = merge(sl, df, "comid")}
+
+  if(!is.null(sl)){
+    AOI[["nhd"]] <- sl
+    cat(crayon::white("Returned object contains: ") %+% crayon::green(paste(paste(length(AOI$nhd), "nhd flowlines"), collapse = ", "), "\n"))
+  }
+
+  return(AOI)
 }

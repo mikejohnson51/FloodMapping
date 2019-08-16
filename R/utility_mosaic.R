@@ -8,35 +8,38 @@
 #' @export
 #' @author Mike Johnson
 
-mosaic.lf = function(input, bb){
+mosaic.lf = function(input){
 
   s = list()
 
-  if(grepl('Spatial', class(bb))){ bb = sf::st_as_sf(bb) }
-
   for(i in seq_along(input)){
-    dat <- raster::raster(input[i])
-
-    bb = sf::st_transform(bb, as.character(dat@crs))
-
-    if(!is.null(raster::intersect(raster::extent(dat),raster::extent(bb)))){
-      s[[paste0("raster", i)]] <- raster::crop(dat, bb, snap = "out")
-    }
+    s[[i]] <- raster::raster(input[i])
+#
+#     bb = sf::st_transform(bb, as.character(dat@crs))
+#
+#     if(!is.null(raster::intersect(raster::extent(dat),raster::extent(bb)))){
+#       s[[paste0("raster", i)]] <- raster::crop(dat, bb, snap = "out")
+# }
   }
 
-  if(length(s) > 1){
-    names(s) <- NULL
-    message("Mosaicing raster...")
-    utils::flush.console()
-    s$fun <- max
-    s$na.rm <- TRUE
-    s$tolerance = 30
-    mos = do.call(raster::merge, s)
-    gc()
-  } else {
+
+  origins<-t(data.frame(lapply(s,raster::origin)))
+
+  min_origin<-c(min(origins[,1]),min(origins[,2]))
+
+  change_origins <- function(x,y){
+    raster::origin(x)<-y
+    x
+  }
+
+  s <- lapply(s, function(x,y) change_origins(x,min_origin))
+
+  if(length(s) == 1){
     mos = s[[1]]
+  } else {
+    mos = do.call(raster::merge, s)
   }
 
-  return(mos)
+  mos
 }
 

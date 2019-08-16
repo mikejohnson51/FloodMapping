@@ -2,13 +2,12 @@
 #'
 #' @param AOI and AOI object generated with the AOI package, or a bounding box
 #' @param type the WBD or nhdplus object to return
-#' @param spatial return `sp` (default) if \code{FALSE} return `sf`
 #' @param filter a XML chunck to filter query
 #'
 #' @return a \code{Spatial} object
 #' @export
 
-query_cida = function(AOI = NULL, type, spatial = TRUE, filter = NULL){
+query_cida = function(AOI = NULL, type, filter = NULL){
 
   df = data.frame(server = c(rep("WBD", 2),
                              rep("nhdplus", 3),
@@ -67,14 +66,12 @@ query_cida = function(AOI = NULL, type, spatial = TRUE, filter = NULL){
   file <- httr::POST(URL, body = filterXML, httr::write_disk(dest, overwrite=T))
 
    filePath <- tempdir()
-   #list.files(filePath)
 
    unzip(dest, exdir = filePath)
 
-
-  myfile = list.files(filePath, pattern = call$call, full.names = TRUE)
-  file.call = substr(basename(myfile[1]), 1, nchar(basename(myfile)) - 4)
-  lines <- sf::read_sf(filePath, file.call)
+  myfile = list.files(filePath, pattern = paste0(call$call, ".shp"), full.names = TRUE)
+  #file.call = substr(basename(myfile[1]), 1, nchar(basename(myfile)) - 4)
+  lines <- sf::read_sf(filePath, call$call)
 
 
   sl = tryCatch({sf::st_zm(lines)},
@@ -85,17 +82,13 @@ query_cida = function(AOI = NULL, type, spatial = TRUE, filter = NULL){
                 }
   )
 
-  #file.remove(c(myfile, dest))
 
-  if(any(is.null(sl), nrow(sl) == 0)) {
-    sl = NULL
-    warning("No features found in this AOI.")
-  } else {
-    if(spatial){ sl = sf::as_Spatial(sl)
-    }
-    return(sl)
-  }
+  if(any(is.null(sl), nrow(sl) == 0)) { sl = NULL; warning("No features found in this AOI.") }
+
+   return(sl)
 
 }
+
+
 
 

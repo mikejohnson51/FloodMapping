@@ -4,14 +4,12 @@
 \alias{query_cida}
 \title{CIDA Server Query}
 \usage{
-query_cida(AOI = NULL, type, spatial = TRUE, filter = NULL)
+query_cida(AOI = NULL, type, filter = NULL)
 }
 \arguments{
 \item{AOI}{and AOI object generated with the AOI package, or a bounding box}
 
 \item{type}{the WBD or nhdplus object to return}
-
-\item{spatial}{return `sp` (default) if \code{FALSE} return `sf`}
 
 \item{filter}{a XML chunck to filter query}
 }
