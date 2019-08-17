@@ -20,7 +20,7 @@
 #' @importFrom foreach %dopar% foreach
 #' @importFrom httr GET POST progress write_disk RETRY
 #' @importFrom parallel detectCores
-#' @importFrom raster raster merge extent intersect crop crs writeRaster
+#' @importFrom raster raster merge extent intersect crop crs writeRaster projectRaster
 #' @importFrom sf read_sf write_sf as_Spatial st_transform st_as_sf
 #' @importFrom stats reshape
 #' @importFrom utils read.csv write.csv globalVariables unzip

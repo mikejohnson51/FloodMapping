@@ -8,20 +8,19 @@
 #' @export
 #' @author Mike Johnson
 
-mosaic.lf = function(input){
+mosaic.lf = function(input = NULL, AOI = NULL){
 
   s = list()
+  bb = getBoundingBox(AOI)
 
   for(i in seq_along(input)){
-    s[[i]] <- raster::raster(input[i])
-#
-#     bb = sf::st_transform(bb, as.character(dat@crs))
-#
-#     if(!is.null(raster::intersect(raster::extent(dat),raster::extent(bb)))){
-#       s[[paste0("raster", i)]] <- raster::crop(dat, bb, snap = "out")
-# }
-  }
+   tmp <- raster::raster(input[i])
+   bb = sf::st_transform(bb, as.character(tmp@crs))
 
+    if(!is.null(raster::intersect(raster::extent(tmp),raster::extent(bb)))){
+      s[[i]] <- raster::crop(tmp, bb, snap = "out")
+      }
+  }
 
   origins<-t(data.frame(lapply(s,raster::origin)))
 
@@ -39,7 +38,5 @@ mosaic.lf = function(input){
   } else {
     mos = do.call(raster::merge, s)
   }
-
-  mos
 }
 

@@ -10,7 +10,6 @@ sf::st_write(input, dsn = paste0(path, "/", var, ".shp"), layer = var,
 
 }
 
-
 #' @title Process Raw HAND Data to an AOI
 #' @description Crop, merge and filter raw HUC6 HAND products to an AOI
 #' @param AOI a list containing spatial a spatial geometry and a collection of NHD reaches
@@ -43,18 +42,17 @@ all.files = list.files(raw.dir, paste(huc6,collapse="|"), full.names = TRUE, rec
 hand.files = all.files[grepl("hand", all.files)]
 hand.path = paste0(g.path, "/hand.tif")
 
-if(!file.exists(hand.path)){ h = mosaic.lf(input = hand.files) }
+if(!file.exists(hand.path)){ h = mosaic.lf(input = hand.files, AOI = AOI$AOI) }
 cat(crayon::white("HAND data cropped and merged for", basename(write.path)), "\n")
 
 catch.files = all.files[grepl("catch", all.files)]
 catch.path = paste0(g.path, "/catchmask.tif")
 
-if(!file.exists(catch.path)){ c = mosaic.lf(input = catch.files) }
+if(!file.exists(catch.path)){ c = mosaic.lf(input = catch.files, AOI = AOI$AOI) }
 cat(crayon::white("CATCHMASK data cropped and merged for", basename(write.path)), "\n")
 
-if(!file.exists(catch.path)){
-    c = raster::crop(c, h, snap = 'out')
-    h = raster::crop(h, c, snap = 'out')
+if(!file.exists(catch.path) && !file.exists(hand.path) ){
+    c = raster::projectRaster(from = c, to = h, method = "ngb")
     raster::writeRaster(c, filename = catch.path, format="GTiff", overwrite = TRUE, options=c('TFW=YES', "COMPRESS=LZW"))
     raster::writeRaster(h, filename = hand.path,  format="GTiff", overwrite = TRUE, options=c('TFW=YES', "COMPRESS=LZW"))
 }
