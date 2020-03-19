@@ -11,24 +11,21 @@ Description: This package aggregates the needed data to map flood extents using
 Encoding: UTF-8
 Depends:
     R(>= 3.3.0),
-    AOI,
-    nwm
 Imports:
-    crayon,
+    dplyr,
     data.table,
     doParallel,
     fastmatch,
+    fst,
     foreach,
-    jsonlite,
+    gdalUtils,
     httr,
+    magrittr,
     parallel,
     raster,
+    RNetCDF,
     sf,
-    stats,
-    utils,
-    velox
-Remotes: mikejohnson51/AOI,
-         mikejohnson51/nwm
+    stats
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 6.1.1
