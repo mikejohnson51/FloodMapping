@@ -68,14 +68,18 @@ crop_project = function(input, output, name, aoi.path, method){
 
 align_rasters = function(HUC6, name.dir){
 
-  all = list.files(name.dir, full.names = TRUE, pattern = HUC6)
+  all   = list.files(name.dir, full.names = TRUE, pattern = HUC6)
   catch = grep("catch", all, value = T)
-  hand =  grep("hand", all, value = T)
+  hand  =  grep("hand", all, value = T)
 
   tmp = paste0(dirname(hand), "//tmp_", basename(hand))
 
   gdalUtils::align_rasters(hand, catch, tmp, overwrite = TRUE)
   file.remove(hand)
+  message(HAND)
+  message(hand)
+  message(TMP)
+  message(tmp)
   file.rename(tmp, hand)
 }
 
