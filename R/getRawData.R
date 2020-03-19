@@ -11,7 +11,7 @@
 
 getRawData = function(AOI, dir, name){
 
-  raw.dir <- raw.files <- type <- NULL
+  raw.files <- type <- NULL
 
   HUC6 = findHUC6(AOI, level = 6) %>% dplyr::pull(HUC6)
 
@@ -33,7 +33,7 @@ getRawData = function(AOI, dir, name){
     # Build list
     to_process = data.frame(HUC6 = rep(HUC6, each = 2),
                             name = name,
-                            raw.files = grep("tif", list.files(raw.dir, pattern = paste(HUC6, collapse = "|"), full.names = TRUE), value = TRUE),
+                            raw.files = grep("tif", list.files(dir, pattern = paste(HUC6, collapse = "|"), full.names = TRUE), value = TRUE),
                             stringsAsFactors = FALSE) %>%
       mutate(cropped = paste0(name.dir, "/", basename(raw.files))) %>%
       mutate( type = ifelse(grepl("hand", raw.files), "HAND", "CATCH")) %>%
