@@ -76,9 +76,9 @@ align_rasters = function(HUC6, name.dir){
 
   gdalUtils::align_rasters(hand, catch, tmp, overwrite = TRUE)
   file.remove(hand)
-  message(HAND)
+  message('HAND')
   message(hand)
-  message(TMP)
+  message('TMP')
   message(tmp)
   file.rename(tmp, hand)
 }
