@@ -18,7 +18,7 @@ Imports:
     fastmatch,
     fst,
     foreach,
-    gdalUtils,
+    gdalUtilities,
     httr,
     magrittr,
     parallel,

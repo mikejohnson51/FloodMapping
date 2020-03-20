@@ -44,11 +44,11 @@ findHUC6 = function(AOI, level = 6){
 #' @param method resampling method (e.g. 'near')
 #' @return on disk rasters files (tiffs)
 #' @export
-#' @importFrom gdalUtils gdalwarp
+#' @importFrom gdalUtilities gdalwarp
 
 crop_project = function(input, output, name, aoi.path, method){
 
-  gdalUtils::gdalwarp(input, output,
+  gdalUtilities::gdalwarp(input, output,
                       t_srs = 'EPSG:3857',
                       dstnodata = NA,
                       cutline  = aoi.path,
@@ -64,24 +64,30 @@ crop_project = function(input, output, name, aoi.path, method){
 #' @param name.dir the directory where data is, and, will be written
 #' @return on disk raster files (tiffs)
 #' @export
-#' @importFrom gdalUtils align_rasters
+#' @importFrom raster crs raster ncol nrow
+#' @importFrom sf st_bbox
+#' @importFrom gdalUtilities gdalwarp
+
 
 align_rasters = function(HUC6, name.dir){
-
   all   = list.files(name.dir, full.names = TRUE, pattern = HUC6)
   catch = grep("catch", all, value = T)
   hand  =  grep("hand", all, value = T)
-
   tmp = paste0(dirname(hand), "//tmp_", basename(hand))
+  catchmask = raster(catch)
 
-  gdalUtils::align_rasters(hand, catch, tmp, overwrite = TRUE)
+  proj4_string <- crs(catchmask)
+  te = as.numeric(st_bbox(catchmask))
+  ts = c(ncol(catchmask), nrow(catchmask))
+
+  synced <- gdalUtilities::gdalwarp(hand, tmp,
+                                   te = te, t_srs = proj4_string, ts = ts)
+
   file.remove(hand)
-  message('HAND')
-  message(hand)
-  message('TMP')
-  message(tmp)
   file.rename(tmp, hand)
 }
+
+
 
 #' @title Merge Rasters
 #' @description Merge rasters from different HUC6 units
@@ -89,7 +95,7 @@ align_rasters = function(HUC6, name.dir){
 #' @param name a name of a study unit
 #' @return a list of local HAND and catchmask filepaths
 #' @export
-#' @importFrom gdalUtils gdalwarp
+#' @importFrom gdalUtilities gdalwarp
 
 merge_rasters = function(name.dir, name){
 
@@ -100,19 +106,18 @@ merge_rasters = function(name.dir, name){
 
   catch = grep("catchmask.tif", all, value = T)
 
-  gdalUtils::gdalwarp(srcfile = catch,
+  gdalUtilities::gdalwarp(srcfile = catch,
                       dstfile = catch.path,
-                      overwrite = TRUE, r = 'near',
-                      options = c("BIGTIFF=YES", "COMPRESSION=LZW"))
+                      overwrite = TRUE, r = 'near')
 
   file.remove(catch, recursive = TRUE)
 
   hand = grep("hand.tif", all, value = T)
 
-  gdalUtils::gdalwarp(hand,
+  gdalUtilities::gdalwarp(hand,
                       hand.path,
-                      overwrite = TRUE, r = 'bilinear',
-                      options = c("BIGTIFF=YES", "COMPRESSION=LZW"))
+                      overwrite = TRUE,
+                      r = 'bilinear')
 
   file.remove(hand, recursive = TRUE)
 
