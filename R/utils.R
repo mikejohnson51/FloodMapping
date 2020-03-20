@@ -76,7 +76,7 @@ align_rasters = function(HUC6, name.dir){
   tmp = paste0(dirname(hand), "//tmp_", basename(hand))
   catchmask = raster(catch)
 
-  proj4_string <- crs(catchmask)
+  proj4_string <- as.character(crs(catchmask))
   te = as.numeric(st_bbox(catchmask))
   ts = c(ncol(catchmask), nrow(catchmask))
 
