@@ -71,19 +71,28 @@ crop_project = function(input, output, name, aoi.path, method){
 
 align_rasters = function(HUC6, name.dir){
   all   = list.files(name.dir, full.names = TRUE, pattern = HUC6)
+  print(all)
   catch = grep("catch", all, value = T)
+  print(catch)
   hand  =  grep("hand", all, value = T)
+  print(hand)
   tmp = paste0(dirname(hand), "//tmp_", basename(hand))
+  print(tmp)
+  message('make raster')
   catchmask = raster(catch)
-
   proj4_string <- as.character(crs(catchmask))
+  print(proj4_string)
   te = as.numeric(st_bbox(catchmask))
+  print(te)
   ts = c(ncol(catchmask), nrow(catchmask))
+  print(ts)
 
   synced <- gdalUtilities::gdalwarp(hand, tmp,
                                    te = te, t_srs = proj4_string, ts = ts)
 
+  print(hand)
   file.remove(hand)
+  print(tmp)
   file.rename(tmp, hand)
 }
 
