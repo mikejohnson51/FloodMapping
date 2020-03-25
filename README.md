@@ -5,9 +5,8 @@
 
 The advent of the National Water Model and the development of the Height Above Nearest Drainage products (HAND) offer the ability to map flood extents for anywhere in the lower 48 United States. The challenges with this methodology stem from the acquisition, management and application of large scale data sets. 
 
-FloodMapper is designed to help users get the data they need, archive it on their local machines, and then process flood extents. In executing the steps in this process the first time the process in run the data is  collected and formatted - meaning it is slow. After the intital pass,  users can quickly generate flood maps for their region from real-time National Water Model output (nomadsNC), staged historic data (nwmHistoric), and can adjust forecasted values to build pre-stages maps (adjust). 
+FloodMapper is designed to help users get the data they need, archive it on their local machines, and then process flood extents. In executing the steps in this process the first time the process in run the data is  collected and formatted - meaning it is slow. After the intital pass,  users can quickly generate flood maps for their region from real-time National Water Model output (nomadsNC),  historic data (nwmHistoric), and can adjust forecasted values to build pre-stages maps (adjust). 
 
-This package is a continuation of the 'LivingFlood' project demonstrated at the 2017 CUASHI HydroInformatics Conference in Tuscaloosa, AL.
 
 ### Installation:
 
