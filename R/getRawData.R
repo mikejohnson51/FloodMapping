@@ -45,8 +45,11 @@ getRawData = function(AOI, dir, name){
     # Crop
     message('Cropping and Projecting Rasters...')
       for(i in 1:nrow(to_process)){
-        crop_project(to_process$raw.files[i], to_process$cropped[i],
-                     to_process$name[i], aoi.path, to_process$method[i])
+        crop_project(to_process$raw.files[i],
+                     to_process$cropped[i],
+                     to_process$name[i],
+                     aoi.path,
+                     to_process$method[i])
       }
 
     # Align

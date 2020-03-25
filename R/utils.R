@@ -50,7 +50,7 @@ crop_project = function(input, output, name, aoi.path, method){
 
   gdalUtilities::gdalwarp(input, output,
                       t_srs = 'EPSG:3857',
-                      dstnodata = NA,
+                      #dstnodata = NA,
                       cutline  = aoi.path,
                       crop_to_cutline = TRUE,
                       r = method,
@@ -87,8 +87,7 @@ align_rasters = function(HUC6, name.dir){
   ts = c(ncol(catchmask), nrow(catchmask))
   print(ts)
 
-  synced <- gdalUtilities::gdalwarp(hand, tmp,
-                                   te = te, t_srs = proj4_string, ts = ts)
+  synced <- gdalUtilities::gdalwarp(hand, tmp, te = te, t_srs = proj4_string, ts = ts)
 
   print(hand)
   file.remove(hand)

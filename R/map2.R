@@ -110,6 +110,7 @@ map_flood = function(hand.path, catchment.path, rating.path, flows.path, add = 0
 
   doParallel::registerDoParallel( parallel::detectCores() - 1 )
 
+
   a <- foreach::foreach(j = 2:ncol(stage), .combine = raster::stack) %dopar% {
     val.v <- stage[fastmatch::fmatch(catch.v, stage$COMID), j]
     fin.v <- val.v - hand.v
