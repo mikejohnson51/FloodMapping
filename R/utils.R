@@ -70,6 +70,7 @@ crop_project = function(input, output, name, aoi.path, method){
 
 
 align_rasters = function(HUC6, name.dir){
+
   all   = list.files(name.dir, full.names = TRUE, pattern = HUC6)
   catch = grep("catch", all, value = T)
 
@@ -86,6 +87,8 @@ align_rasters = function(HUC6, name.dir){
 
   synced <- gdalUtilities::gdalwarp(hand, tmp, te = te, t_srs = proj4_string, ts = ts)
 
+  file.remove(hand)
+  file.rename(synced, hand)
 }
 
 

@@ -15,7 +15,7 @@ getRawData = function(AOI, dir, name){
 
   HUC6 = findHUC6(AOI, level = 6) %>% dplyr::pull(HUC6)
 
-    lapply(HUC6, download_ut, outdir = dir)
+  lapply(HUC6, download_ut, outdir = dir)
 
     # Make name folder
     name.dir = paste0(dir,"//", name)
