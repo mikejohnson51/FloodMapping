@@ -76,6 +76,3 @@ downloader <- function(dir, url) {
 
   return(file)
 }
-
-
-http://web.corral.tacc.utexas.edu/nfiedata/HAND/102701/102701catchmask.tif
