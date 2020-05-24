@@ -72,6 +72,8 @@ crop_project = function(input, output, name, aoi.path, method){
 align_rasters = function(HUC6, name.dir){
 
   all   = list.files(name.dir, full.names = TRUE, pattern = HUC6)
+  all   = grep("tif$", all, value = T)
+
   catch = grep("catch", all, value = T)
 
   hand  =  grep("hand", all, value = T)

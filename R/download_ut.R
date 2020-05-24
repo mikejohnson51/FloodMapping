@@ -11,7 +11,7 @@ download_ut <- function(HUC6, outdir, type = 'all'){
 
   files = c('catchmask', 'rating', 'hand')
 
-  if(!type %in% c(files, 'all')){
+  if(any(!type %in% c(files, 'all'))){
     stop(paste("Type must be one or more of: ", paste(files, collapse = ", "), "or all"))
   }
 

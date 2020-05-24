@@ -24,17 +24,17 @@ getRawData = function(AOI, dir, name){
 
     if(!file.exists(catch.path) | !file.exists(hand.path)){
 
-    if(!dir.exists(name.dir)){ dir.create(name.dir)}
+    if(!dir.exists(name.dir)){ dir.create(name.dir) }
     # Write AOI
     aoi.path = paste0(name.dir, "//", name, ".shp")
-    AOI      = AOI %>%
-      st_transform(3857)
+    AOI      = st_transform(AOI, 3857)
+
     sf::write_sf(AOI, dsn = aoi.path)
 
     # Build list
     to_process = data.frame(HUC6 = rep(HUC6, each = 2),
                             name = name,
-                            raw.files = grep("tif",
+                            raw.files = grep("tif$",
                                              list.files(dir, pattern = paste(HUC6, collapse = "|"),
                                              full.names = TRUE), value = TRUE),
                             stringsAsFactors = FALSE) %>%
