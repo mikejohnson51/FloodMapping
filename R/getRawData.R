@@ -13,7 +13,7 @@ getRawData = function(AOI, dir, name){
 
   raw.files <- type <- NULL
 
-  HUC6 = findHUC6(AOI, level = 6) %>% dplyr::pull(HUC6)
+  HUC6 = findHUC6(AOI, level = 6) %>% dplyr::pull(huc6)
 
   lapply(HUC6, download_ut, outdir = dir)
 
