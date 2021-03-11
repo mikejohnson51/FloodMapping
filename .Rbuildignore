@@ -6,3 +6,4 @@ inProgress
 _pkgdown.yml
 docs
 vignettes
+^README\.Rmd$

@@ -4,10 +4,10 @@
 \alias{align_rasters}
 \title{Align Rasters of possibly differnt diminsions/stats}
 \usage{
-align_rasters(HUC6, name.dir)
+align_rasters(huc6, name.dir)
 }
 \arguments{
-\item{HUC6}{A HUC6 unit}
+\item{huc6}{A HUC6 unit}
 
 \item{name.dir}{the directory where data is, and, will be written}
 }

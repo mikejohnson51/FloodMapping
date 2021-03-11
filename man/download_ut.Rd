@@ -4,7 +4,7 @@
 \alias{download_ut}
 \title{Download HAND, RC, and Cathmask rasters by HUC6}
 \usage{
-download_ut(HUC6, outdir, type = "all")
+download_ut(HUC6, outdir, type = "hand")
 }
 \arguments{
 \item{HUC6}{A HUC6 unit to download}

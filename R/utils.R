@@ -30,8 +30,6 @@ findHUC6 = function(AOI, level = 6){
     tryCatch({ sf::read_sf(url) %>% st_transform(sf::st_crs(AOI)) },
                    warning = function(w) { NULL },
                    error = function(e) { NULL })
-
-
 }
 
 
@@ -44,56 +42,68 @@ findHUC6 = function(AOI, level = 6){
 #' @param method resampling method (e.g. 'near')
 #' @return on disk rasters files (tiffs)
 #' @export
-#' @importFrom gdalUtilities gdalwarp
+#' @importFrom sf gdal_utils
 
 crop_project = function(input, output, name, aoi.path, method){
 
-  gdalUtilities::gdalwarp(input, output,
-                      t_srs = 'EPSG:3857',
-                      #dstnodata = NA,
-                      cutline  = aoi.path,
-                      crop_to_cutline = TRUE,
-                      r = method,
-                      overwrite = TRUE)
+  sf::gdal_utils(util = "warp",
+                 source = input,
+                 destination = output,
+                 options = c('-t_srs', "EPSG:3857",
+                             '-cutline', aoi.path,
+                             '-crop_to_cutline', TRUE,
+                             "-r", method))
+#
+#   gdalUtilities::gdalwarp(input, output,
+#                       t_srs = 'EPSG:3857',
+#                       #dstnodata = NA,
+#                       cutline  = aoi.path,
+#                       crop_to_cutline = TRUE,
+#                       r = method,
+#                       overwrite = TRUE)
 
 }
 
 #' @title Align Rasters of possibly differnt diminsions/stats
 #' @description Align catchmask and HAND rasters to catchmask grid
-#' @param HUC6 A HUC6 unit
+#' @param huc6 A HUC6 unit
 #' @param name.dir the directory where data is, and, will be written
 #' @return on disk raster files (tiffs)
 #' @export
 #' @importFrom raster crs raster ncol nrow
 #' @importFrom sf st_bbox
-#' @importFrom gdalUtilities gdalwarp
+#' @importFrom sf gdal_utils
 
 
-align_rasters = function(HUC6, name.dir){
+align_rasters = function(huc6, name.dir){
 
-  all   = list.files(name.dir, full.names = TRUE, pattern = HUC6)
+  all   = list.files(name.dir, full.names = TRUE, pattern = huc6)
   all   = grep("tif$", all, value = T)
 
-  catch = grep("catch", all, value = T)
+  #catch = grep("catch", all, value = T)
 
-  hand  =  grep("hand", all, value = T)
+  hand.path  =  grep("hand", all, value = T)
 
-  tmp = paste0(dirname(hand), "//tmp_", basename(hand))
+  tmp = paste0(dirname(hand.path), "//tmp_", basename(hand.path))
 
-  catchmask = raster(catch)
-  proj4_string <- as.character(crs(catchmask))
+  hand = raster(hand.path)
+  proj4_string <- as.character(crs(hand))
 
-  te = as.numeric(st_bbox(catchmask))
+  te = as.numeric(st_bbox(hand))
 
-  ts = c(ncol(catchmask), nrow(catchmask))
+  ts = c(ncol(hand), nrow(hand))
 
-  synced <- gdalUtilities::gdalwarp(hand, tmp, te = te, t_srs = proj4_string, ts = ts)
+  sf::gdal_utils(util = "warp",
+                 source = hand.path,
+                 destination = tmp,
+                          options = c('-t_srs', proj4_string,
+                               '-te', te, '-ts', ts))
 
-  file.remove(hand)
-  file.rename(synced, hand)
+  #gdalUtilities::gdalwarp(hand, tmp, te = te, t_srs = proj4_string, ts = ts)
+
+  file.remove(hand.path)
+  file.rename(tmp, hand.path)
 }
-
-
 
 #' @title Merge Rasters
 #' @description Merge rasters from different HUC6 units
@@ -101,51 +111,44 @@ align_rasters = function(HUC6, name.dir){
 #' @param name a name of a study unit
 #' @return a list of local HAND and catchmask filepaths
 #' @export
-#' @importFrom gdalUtilities gdalwarp
+#' @importFrom sf gdal_utils
 
 merge_rasters = function(name.dir, name){
 
-  catch.path = paste0(name.dir, "/catchmask_", name,".tif")
+  #catch.path = paste0(name.dir, "/catchmask_", name,".tif")
   hand.path  = paste0(name.dir, "/hand_", name,".tif")
 
   all = list.files(name.dir, full.names = TRUE)
 
-  catch = grep("catchmask.tif", all, value = T)
+  #catch = grep("catchmask.tif", all, value = T)
 
-  gdalUtilities::gdalwarp(srcfile = catch,
-                      dstfile = catch.path,
-                      overwrite = TRUE, r = 'near')
+  # sf::gdal_utils(util = "warp",
+  #                source = catch,
+  #                destination = catch.path,
+  #                options = c('-r', "near", "-overwrite"))
+  # gdalUtilities::gdalwarp(srcfile = catch,
+  #                     dstfile = catch.path,
+  #                     overwrite = TRUE, r = 'near')
 
-  file.remove(catch, recursive = TRUE)
+  #file.remove(catch, recursive = TRUE)
 
   hand = grep("hand.tif", all, value = T)
 
-  gdalUtilities::gdalwarp(hand,
-                      hand.path,
-                      overwrite = TRUE,
-                      r = 'bilinear')
+  sf::gdal_utils(util = "warp",
+                 source = hand,
+                 destination = hand.path,
+                 options = c('-r', "bilinear", "-overwrite"))
+
+  # gdalUtilities::gdalwarp(hand,
+  #                     hand.path,
+  #                     overwrite = TRUE,
+  #                     r = 'bilinear')
 
   file.remove(hand, recursive = TRUE)
 
-  return(list(
-    hand.path = hand.path,
-    catch.path = catch.path
-  ))
-}
-
-#' @title Extract Rating Curve Table
-#' @description Extract Rating Curve Table
-#' @param HUC6 a HUC6 unit
-#' @param raw.dir the directory where RAW downloaded HAND data goes
-#' @param comids a vector of COMIDs of interest
-#' @return a rating curve tabel
-#' @importFrom fst read.fst
-#' @importFrom dplyr filter
-#' @export
-
-get_rc_table = function(HUC6, raw.dir, comids){
-  COMID <- NULL
-  rc.path = paste0(raw.dir, "/hydroprop-fulltable-", HUC6, ".nohand0.fst")
-  rc = fst::read.fst(rc.path)
-  rc %>% filter(COMID %in% comids)
+  return(#list(
+    hand.path# = hand.path,
+    #catch.path = catch.path
+  #)
+  )
 }

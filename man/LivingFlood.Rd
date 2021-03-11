@@ -3,7 +3,6 @@
 \docType{package}
 \name{LivingFlood}
 \alias{LivingFlood}
-\alias{LivingFlood-package}
 \title{LivingFlood}
 \description{
 \code{LivingFlood} package
