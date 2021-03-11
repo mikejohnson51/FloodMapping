@@ -7,7 +7,8 @@
 language: r
 cache: packages
 sudo: required
-dist: trusty
+dist: xenial
+latex: false
 
 matrix:
   include:
@@ -27,10 +28,6 @@ env:
      - _R_CHECK_FORCE_SUGGESTS_=false
 
 warnings_are_errors: false
-
-r_github_packages:
-  - mikejohnson51/AOI
-  - mikejohnson51/nwm
 
 script:
   - |

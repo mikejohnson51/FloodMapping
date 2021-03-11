@@ -5,15 +5,13 @@
 #' @return a list of file paths
 #' @export
 #' @importFrom dplyr pull mutate bind_rows
-#' @importFrom fst write.fst
-#' @importFrom raster raster getValues
-#' @importFrom sf st_transform write_sf
+#' @importFrom raster raster getValues writeRaster
+#' @importFrom sf st_transform write_sf st_cast
+#' @importFrom fasterize fasterize
 
 getRawData = function(AOI, dir, name){
 
-  raw.files <- type <- NULL
-
-  HUC6 = findHUC6(AOI, level = 6) %>% dplyr::pull(huc6)
+  HUC6 = findHUC6(AOI, level = 6)$huc6
 
   lapply(HUC6, download_ut, outdir = dir)
 
@@ -22,46 +20,54 @@ getRawData = function(AOI, dir, name){
     catch.path = paste0(name.dir, "/catchmask_", name,".tif")
     hand.path = paste0(name.dir, "/hand_", name,".tif")
 
-    if(!file.exists(catch.path) | !file.exists(hand.path)){
+  if(!file.exists(catch.path) |
+     !file.exists(hand.path)){
 
     if(!dir.exists(name.dir)){ dir.create(name.dir) }
     # Write AOI
-    aoi.path = paste0(name.dir, "//", name, ".shp")
+    aoi.path = paste0(name.dir, "//", name, ".gpkg")
     AOI      = st_transform(AOI, 3857)
 
     sf::write_sf(AOI, dsn = aoi.path)
 
     # Build list
-    to_process = data.frame(HUC6 = rep(HUC6, each = 2),
+    to_process = data.frame(HUC6 = rep(HUC6, each = 1),
                             name = name,
                             raw.files = grep("tif$",
                                              list.files(dir, pattern = paste(HUC6, collapse = "|"),
                                              full.names = TRUE), value = TRUE),
                             stringsAsFactors = FALSE) %>%
-      mutate(cropped = paste0(name.dir, "/", basename(raw.files))) %>%
-      mutate(type    = ifelse(grepl("hand", raw.files), "HAND", "CATCH")) %>%
-      mutate(method  = ifelse(type == "HAND", 'bilinear', 'near'))
+      mutate(cropped = paste0(name.dir, "/", basename(.data$raw.files))) %>%
+      mutate(type    = ifelse(grepl("hand", .data$raw.files), "HAND", "CATCH")) %>%
+      mutate(method  = ifelse(.data$type == "HAND", 'bilinear', 'near'))
 
     # Crop
     message('Cropping and Projecting Rasters...')
       for(i in 1:nrow(to_process)){
-        crop_project(to_process$raw.files[i],
-                     to_process$cropped[i],
-                     to_process$name[i],
-                     aoi.path,
-                     to_process$method[i])
+        crop_project(input    = to_process$raw.files[i],
+                     output   = to_process$cropped[i],
+                     name     = to_process$name[i],
+                     aoi.path = aoi.path,
+                     method   = to_process$method[i])
       }
 
     # Align
     message('Aligning Rasters...')
       for(i in 1:length(HUC6)){
-        align_rasters(HUC6[i], name.dir)
+        align_rasters(huc6 = HUC6[i], name.dir)
       }
 
     # Merge Rasters
     message('Merging Rasters...')
     files  = merge_rasters(name.dir, name)
-    comids = unique(getValues(raster(files$catch.path)))
+    hand = raster(hand.path)
+    cat = nhdplusTools::get_nhdplus(AOI, realization = "catchment")
+    catchmask = fasterize::fasterize(sf::st_cast(cat), hand, field = "featureid")
+    writeRaster(catchmask, catch.path)
+    #comids = unique(getValues(raster(files$catch.path)))
+
+    files = list(hand.path = hand.path,
+                 catch.path = catch.path)
 
     } else {
       message('Files Already Processed...')
@@ -69,17 +75,7 @@ getRawData = function(AOI, dir, name){
                    catch.path = catch.path)
     }
 
-    files$rating.path =  paste0(name.dir, '/rating_',name,'.fst')
-
-    if(!file.exists(files$rating.path)){
-    message('Subsetting Rating Curve Files...')
-    lapply(HUC6, get_rc_table, raw.dir = dir, comids = comids ) %>%
-      bind_rows() %>%
-      fst::write.fst(path = files$rating.path)
-    }
-
     return(files)
-
 }
 
 

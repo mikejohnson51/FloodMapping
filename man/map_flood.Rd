@@ -4,22 +4,22 @@
 \alias{map_flood}
 \title{Map flood extents from processed data}
 \usage{
-map_flood(hand.path, catchment.path, rating.path, flows.path, add = 0)
+map_flood(hand.path, catchment.path, flows.path, add = 0, threshold = 0)
 }
 \arguments{
 \item{hand.path}{a path to HAND tif}
 
 \item{catchment.path}{a path to catchmask tif}
 
-\item{rating.path}{a path to rating fst file}
-
 \item{flows.path}{a path to a flows nc file}
 
 \item{add}{numeric. A uniform depth to add to simulated inudation}
+
+\item{threshold}{a value to exclude values less then}
 }
 \value{
 a raster stack of innudation maps
 }
 \description{
-This function takes a folder of processed data and generates a HAND inudation raster for each timestep
+This function takes a folder of processed data and generates a HAND inundation raster for each timestep
 }

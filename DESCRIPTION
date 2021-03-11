@@ -13,25 +13,21 @@ Encoding: UTF-8
 Depends:
     R(>= 3.3.0),
 Imports:
-    dplyr,
     data.table,
-    doParallel,
+    dplyr,
     fasterize,
-    fastmatch,
-    fst,
-    foreach,
-    gdalUtilities,
     httr,
     magrittr,
     nhdplusTools,
-    parallel,
+    nwmHistoric,
     plyr,
     progress,
+    rlang,
     raster,
     RNetCDF,
     sf,
-    stats,
     tibble
+Remotes: mikejohnson51/nwmHistoric
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 7.1.1

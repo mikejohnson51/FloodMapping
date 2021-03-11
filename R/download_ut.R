@@ -7,7 +7,7 @@
 #' @export
 
 
-download_ut <- function(HUC6, outdir, type = 'all'){
+download_ut <- function(HUC6, outdir, type = 'hand'){
 
   files = c('catchmask', 'rating', 'hand')
 
@@ -37,39 +37,23 @@ download_ut <- function(HUC6, outdir, type = 'all'){
 #' @param dir path to output directory
 #' @param url the location of the online resource
 #' @importFrom httr GET write_disk progress
-#' @importFrom data.table fread
-#' @importFrom fst write.fst
 
 downloader <- function(dir, url) {
 
   if (!dir.exists(dir)) { dir.create(dir, recursive = T) }
 
-  file <-  gsub('csv', 'fst', file.path(dir, basename(url)))
+  file = paste0(dir, basename(url))
 
   if (!file.exists(file)) {
     message("\tDownloading ", basename(url))
 
-    if (grepl('fst', file)) {
-      ratings <-  data.table::fread(
-        url,
-        select = c("CatchId", "Stage", 'Discharge (m3s-1)'),
-        showProgress = TRUE,
-        data.table   = FALSE
-      )
-
-      names(ratings) = c("COMID", "Y", "Qcms")
-      fst::write.fst(ratings, path = file)
-
-    } else {
-      resp <-  httr::GET(url,
+    resp <-  httr::GET(url,
                          httr::write_disk(file, overwrite = TRUE),
                          httr::progress())
 
       if (resp$status_code != 200) {
         warning(basename(url), " Download unsuccessfull :(")
       }
-    }
-
   } else {
     message("\t", basename(url), " already exists ...")
   }
