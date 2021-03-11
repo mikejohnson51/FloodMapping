@@ -1,7 +1,8 @@
 Package: FloodMapping
 Title: Map Flood extents using HAND and the National Water Model
 Version: 0.0.0.9000
-Authors@R: person("Mike", "Johnson", role = c("aut", "cre"), email = "mike.johnson@geog.ucsb.edu")
+Authors@R: c(person("Mike", "Johnson", role = c("aut", "cre"), email = "mike.johnson@geog.ucsb.edu"),
+             person("Justin", "Singh-Mohudpur", role = c("ctb"), email = "justinsingh-mohudpur@ucsb.edu"))
 Maintainer: Mike Johnson <jmj00@ucdb.com>
 BugReports: https://github.com/mikejohnson51/FloodMapping/issues
 Description: This package aggregates the needed data to map flood extents using 
