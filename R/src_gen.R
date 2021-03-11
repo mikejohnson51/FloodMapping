@@ -41,7 +41,7 @@ get_src <- function(comids, hand, stage = 0:20, progress = TRUE) {
                    source = hand@file@name,
                    destination = tmp,
                    processing = "slope",
-                   options = c("-p", "-s 111120"))
+                   options = c("-p"))
 
     slope <- raster::raster(tmp)
     slope[is.na(slope[])] <- 0
