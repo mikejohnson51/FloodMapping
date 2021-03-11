@@ -5,6 +5,8 @@
 #' @param progress If \code{TRUE}, output a progress bar.
 #' @return A \code{data.frame} representing the SRC table.
 #' @importFrom nhdplusTools get_vaa
+#' @importFrom data.table :=
+#' @importFrom plyr .
 #' @export
 get_src <- function(comids, hand, stage = 0:20, progress = TRUE) {
     if (progress) {
@@ -86,7 +88,7 @@ get_src <- function(comids, hand, stage = 0:20, progress = TRUE) {
                         Y = y
                     ) %>%
                     dplyr::ungroup() %>%
-                    dplyr::filter(across(.fns = is.finite)) %>%
+                    dplyr::filter(dplyr::across(.fns = is.finite)) %>%
                     data.table::as.data.table() %>%
                     .[,
                       Q := compute_flat_tub(y, hand_slope) * n_prod,

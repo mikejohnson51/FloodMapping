@@ -25,6 +25,7 @@ Imports:
     magrittr,
     nhdplusTools,
     parallel,
+    plyr,
     progress,
     raster,
     RNetCDF,
