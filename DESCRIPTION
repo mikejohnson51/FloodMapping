@@ -28,7 +28,8 @@ Imports:
     raster,
     RNetCDF,
     sf,
-    stats
+    stats,
+    tibble
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 7.1.1
