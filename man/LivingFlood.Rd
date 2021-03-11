@@ -3,7 +3,6 @@
 \docType{package}
 \name{LivingFlood}
 \alias{LivingFlood}
-\alias{LivingFlood-package}
 \title{LivingFlood}
 \description{
 \code{LivingFlood} package
@@ -11,5 +10,5 @@
 \details{
 Generate near real-time and forecasted flood extents using the National Water Model, HAND and SRC methods
 
-See the README on [github](https://github.com/mikejohnson51/FloodMapping)
+See the README on \href{https://github.com/mikejohnson51/FloodMapping}{github}
 }

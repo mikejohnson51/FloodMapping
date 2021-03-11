@@ -15,17 +15,21 @@ Imports:
     dplyr,
     data.table,
     doParallel,
+    fasterize,
     fastmatch,
     fst,
     foreach,
     gdalUtilities,
     httr,
     magrittr,
+    nhdplusTools,
     parallel,
+    progress,
     raster,
     RNetCDF,
     sf,
     stats
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
+Roxygen: list(markdown = TRUE)

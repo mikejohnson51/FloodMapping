@@ -52,7 +52,7 @@ devtools::install_github("mikejohnson51/FloodMapping")
 Now each time you start R you can access the LivingFlood Package by calling the library:
 
 ```{r, eval = F}
-library(LivingFlood)
+library(FloodMapping)
 ```
 
 Now we are ready to start processing data and mapping floods!!

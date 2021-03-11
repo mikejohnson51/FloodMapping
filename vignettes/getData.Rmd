@@ -17,13 +17,13 @@ devtools::load_all(".")
 
 To reduce the size of the data needed,LivingFlood has been designed to compliment the AOI package. AOI allows users to define an area of interest by a location and/or boundng box dimisions to yeild a spatial geometry. A detailed look at this process can be found [here](...). For this example we are interested in the  100 square mile regions surrounding Boulder, Colorado.
 
-```{r}
+```{r, eval = F}
 AOI = getAOI(list("Boulder", 10, 10))
 ```
 
 To make sure that our AOI is defined as we hoped we can use the AOI::check() fucntion:
 
-```{r}
+```{r, eval = F}
 check(AOI)
 ```
 
@@ -54,7 +54,7 @@ knitr::include_graphics("imgs/download.png")
 As previously mentioned the convince of this porgram and sticking to the RProj folder is that if you try to download the same file again, the raw directory is checked first and only the needed files are downloaded. 
 
 ```{r, eval = F}
-data = getData(AOI, name = "BoulderStudy")
+data = getRawData(AOI, name = "BoulderStudy")
 ```
 
 ```{r, out.width = "600px", echo = FALSE}
@@ -99,7 +99,7 @@ read.csv("/Users/mikejohnson/Documents/GitHub/LivingFlood/vignettes/meta_data2.c
 ```{r, eval = F}
 data = getAOI('Denver') %>% getData(name = "denver")
 ```
-```{r}
+```{r, eval = F}
 read.csv("./LIVINGFLOOD/meta_data.csv")
 ```
 
@@ -111,7 +111,7 @@ Looking more closly at the RAW folder we find three sub folders each with HAND, 
 knitr::include_graphics("imgs/raw.png")
 ```
 
-###Processed Data
+### Processed Data
 
 ```{r, out.width = "600px", echo = FALSE}
 knitr::include_graphics("imgs/region.png")
