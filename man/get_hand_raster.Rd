@@ -3,10 +3,6 @@
 \name{get_hand_raster}
 \alias{get_hand_raster}
 \title{Get HAND Raster for an AOI}
-\source{
-Attribution: The \code{elevatr} R package.
-\url{https://github.com/jhollist/elevatr}
-}
 \usage{
 get_hand_raster(
   locations,

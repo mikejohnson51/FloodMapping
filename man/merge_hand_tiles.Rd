@@ -3,10 +3,6 @@
 \name{merge_hand_tiles}
 \alias{merge_hand_tiles}
 \title{Merge Rasters}
-\source{
-Attribution: The \code{elevatr} R package.
-\url{https://github.com/jhollist/elevatr}
-}
 \usage{
 merge_hand_tiles(
   raster_list,
@@ -30,7 +26,5 @@ else, return the file path to the object}
 \description{
 Merge multiple downloaded raster files into a single file.
 The input \code{target_prj} describes the projection for the new grid.
-
-\strong{Note: this function is for internal use. Use \link{get_hand_raster}.}
 }
 \keyword{internal}

@@ -3,10 +3,6 @@
 \name{download_tiles}
 \alias{download_tiles}
 \title{Get HAND Tiles from an AWS S3 Bucket}
-\source{
-Attribution: The \code{elevatr} R package.
-\url{https://github.com/jhollist/elevatr}
-}
 \usage{
 download_tiles(locations, z = 0, prj, expand = NULL, ...)
 }
@@ -32,7 +28,5 @@ vector.}
 This function uses AWS S3 to retrieve HAND rasters from the geotiff folder.
 It accepts a \code{sf::st_bbox} object as input and returns a single raster
 object covering that extent.
-
-\strong{Note: this function is for internal use. Use \link{get_hand_raster}.}
 }
 \keyword{internal}

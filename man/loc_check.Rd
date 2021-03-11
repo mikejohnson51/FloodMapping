@@ -4,10 +4,6 @@
 \alias{loc_check}
 \title{function to check input type and projection.  All input types convert to a
 SpatialPointsDataFrame for point elevation and bbx for raster.}
-\source{
-Attribution: The \code{elevatr} R package.
-\url{https://github.com/jhollist/elevatr}
-}
 \usage{
 loc_check(locations, prj = NULL)
 }

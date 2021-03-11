@@ -3,10 +3,6 @@
 \name{proj_expand}
 \alias{proj_expand}
 \title{Project bounding box and Expand if needed}
-\source{
-Attribution: The \code{elevatr} R package.
-\url{https://github.com/jhollist/elevatr}
-}
 \usage{
 proj_expand(locations, prj, expand)
 }

@@ -25,7 +25,7 @@ A roughness value
 }
 \description{
 This function querys a REST API serving the Gradient Boosting machine
-learning model developed in:
+learning model developed in the in-review paper:
 
 \strong{Johnson, J.M., Eyelade D., Clarke K.C, Singh-Mohudpur, J. (2021)
 \emph{“Characterizing Reach-level Empirical Roughness Along the National

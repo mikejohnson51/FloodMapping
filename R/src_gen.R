@@ -3,12 +3,16 @@
 #' @param hand A HAND \code{raster}.
 #' @param stage A set of stage values. Defaults to \code{0:20}.
 #' @param progress If \code{TRUE}, output a progress bar.
+#' @param slope_scale Ratio of vertical units to horizontal.
+#'                    Uses \code{slope_scale = 111120} by default.
+#'                    See [gdaldem](https://gdal.org/programs/gdaldem.html).
 #' @return A \code{data.frame} representing the SRC table.
 #' @importFrom nhdplusTools get_vaa
 #' @importFrom data.table :=
 #' @importFrom plyr .
 #' @export
-get_src <- function(comids, hand, stage = 0:20, progress = TRUE) {
+get_src <- function(comids, hand, stage = 0:20,
+                    progress = TRUE, slope_scale = 111120) {
     if (progress) {
         pb <- progress::progress_bar$new(
             total = length(stage) + 3,
@@ -41,7 +45,10 @@ get_src <- function(comids, hand, stage = 0:20, progress = TRUE) {
                    source = hand@file@name,
                    destination = tmp,
                    processing = "slope",
-                   options = c("-p"))
+                   options = c(
+                       "-p",
+                       "-s", as.character(slope_scale)
+                   ))
 
     slope <- raster::raster(tmp)
     slope[is.na(slope[])] <- 0

@@ -3,10 +3,6 @@
 \name{clip_it}
 \alias{clip_it}
 \title{Clip the HAND raster}
-\source{
-Attribution: The \code{elevatr} R package.
-\url{https://github.com/jhollist/elevatr}
-}
 \usage{
 clip_it(rast, loc, expand, clip)
 }

@@ -3,12 +3,8 @@
 \name{estimate_raster_size}
 \alias{estimate_raster_size}
 \title{Estimate download size of DEMs}
-\source{
-Attribution: The \code{elevatr} R package.
-\url{https://github.com/jhollist/elevatr}
-}
 \usage{
-estimate_raster_size(locations, z = NULL)
+estimate_raster_size(locations)
 }
 \arguments{
 \item{locations}{the locations}
