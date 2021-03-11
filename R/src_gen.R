@@ -148,16 +148,20 @@ get_catchmask <- function(aoi, template) {
 #' @return A roughness value
 #' @export
 get_roughness <- function(pathlength, arbolatesu, lengthkm, areasqkm, slope) {
-    httr::content(httr::POST(
-        url = "https://src-api.justinsingh.me/roughness",
-        query = list(
-            pathlength = pathlength,
-            arbolatesu = arbolatesu,
-            lengthkm   = lengthkm,
-            areasqkm   = areasqkm,
-            slope      = slope
+    response <- httr::content(
+        httr::POST(
+            url = "https://src-api.justinsingh.me/roughness",
+            query = list(
+                pathlength = pathlength,
+                arbolatesu = arbolatesu,
+                lengthkm   = lengthkm,
+                areasqkm   = areasqkm,
+                slope      = slope
+            )
         )
-    ))
+    )
+
+    response[[1]]
 }
 
 #' @title Find COMIDs for an AOI via the NHD
