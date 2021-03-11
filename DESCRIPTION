@@ -25,8 +25,7 @@ Imports:
     rlang,
     raster,
     RNetCDF,
-    sf,
-    tibble
+    sf
 Remotes: mikejohnson51/nwmHistoric
 License: MIT + file LICENSE
 LazyData: true

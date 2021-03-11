@@ -35,8 +35,18 @@ get_src <- function(comids, hand, stage = 0:20, progress = TRUE) {
     # Fix NA values
     hand[is.na(hand[])] <- 0
     # Generate Slope Raster
-    slope <- raster::terrain(hand)
+    tmp <- tempfile(fileext = ".tif")
+
+    sf::gdal_utils(util = "demprocessing",
+                   source = hand@file@name,
+                   destination = tmp,
+                   processing = "slope",
+                   options = c("-p", "-s 111120"))
+
+    slope <- raster::raster(tmp)
     slope[is.na(slope[])] <- 0
+    unlink(tmp)
+
     # Get raster cell resolution
     res <- compute_cellres(hand)
     # Create HAND_Slope data frame
@@ -69,7 +79,8 @@ get_src <- function(comids, hand, stage = 0:20, progress = TRUE) {
                 "roughness"
             )
         ) %>%
-        dplyr::filter(comid %in% comids)
+        dplyr::filter(comid %in% comids) %>%
+        na.omit()
 
     if (progress) pb$tick()
 
@@ -81,7 +92,6 @@ get_src <- function(comids, hand, stage = 0:20, progress = TRUE) {
                 if (progress) pb$tick()
 
                 vaa %>%
-                    na.omit() %>%
                     dplyr::group_by(comid) %>%
                     dplyr::mutate(
                         n_prod = sqrt(slope) / ((lengthkm * 1000) * roughness),
@@ -97,7 +107,7 @@ get_src <- function(comids, hand, stage = 0:20, progress = TRUE) {
             }
         ) %>%
         data.table::rbindlist() %>%
-        tibble::as_tibble() %>%
+        as.data.frame() %>%
         dplyr::select(comid, Y, Q) %>%
         dplyr::rename(COMID = comid)
 
@@ -118,12 +128,10 @@ get_catchmask <- function(aoi, template) {
     this_nhd <- nhdplusTools::get_nhdplus(
                     aoi,
                     realization = "catchment"
-                ) %>%
-                sf::st_as_sf() %>%
-                sf::st_cast("MULTIPOLYGON")
+                )
 
     fasterize::fasterize(
-        this_nhd,
+        sf::st_cast(this_nhd),
         template,
         field = "featureid"
     )
@@ -133,7 +141,7 @@ get_catchmask <- function(aoi, template) {
 #'
 #' @description
 #' This function querys a REST API serving the Gradient Boosting machine
-#' learning model developed in:
+#' learning model developed in the in-review paper:
 #'
 #' **Johnson, J.M., Eyelade D., Clarke K.C, Singh-Mohudpur, J. (2021)
 #' *“Characterizing Reach-level Empirical Roughness Along the National

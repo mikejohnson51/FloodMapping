@@ -6,8 +6,6 @@
 #' a \code{sf}, or \code{raster} object as input.
 #' A \code{raster} object is returned.
 #'
-#' @source Attribution: The `elevatr` R package.
-#'         \url{https://github.com/jhollist/elevatr}
 #'
 #' @param locations Either a \code{data.frame} of x (long) and y (lat), a
 #'                  \code{sf}, or \code{raster} object as input.
@@ -55,7 +53,7 @@ get_hand_raster <- function(locations, prj = NULL,
     prj       <- sf::st_crs(locations)$wkt
 
     # Check download size and provide feedback, stop if too big!
-    dl_size <- estimate_raster_size(locations, z = 0)
+    dl_size <- estimate_raster_size(locations)
 
     if (dl_size > 100 & dl_size < 500) {
         message(paste0("Note: Your request will download approximately ",
@@ -114,11 +112,6 @@ get_hand_raster <- function(locations, prj = NULL,
 #' This function uses AWS S3 to retrieve HAND rasters from the geotiff folder.
 #' It accepts a \code{sf::st_bbox} object as input and returns a single raster
 #' object covering that extent.
-#' 
-#' **Note: this function is for internal use. Use \link{get_hand_raster}.**
-#'
-#' @source Attribution: The `elevatr` R package.
-#'         \url{https://github.com/jhollist/elevatr}
 #'
 #' @param bbx a \code{sf::st_bbox} object that is used to select x,y,z tiles.
 #' @param z The zoom level to return. The HAND tiles only use `z = 0`.
@@ -186,11 +179,6 @@ download_tiles <- function(locations, z = 0, prj, expand = NULL, ...) {
 #' Merge multiple downloaded raster files into a single file.
 #' The input `target_prj` describes the projection for the new grid.
 #'
-#' **Note: this function is for internal use. Use \link{get_hand_raster}.**
-#'
-#' @source Attribution: The `elevatr` R package.
-#'         \url{https://github.com/jhollist/elevatr}
-#'
 #' @param raster_list a list of raster file paths to be mosaiced
 #' @param target_prj the target projection of the output raster
 #' @param method the method for resampling/reprojecting. Default is 'bilinear'.
@@ -244,6 +232,25 @@ get_hand_xy <- function(aoi) {
                       ymin = 29.48632,
                       ymax = 35.97485)
 
+    if ("bbox" %in% class(aoi)) {
+        temp_bb <- aoi
+    } else {
+        temp_bb <- sf::st_transform(aoi, 4326) %>%
+                   sf::st_bbox()
+    }
+
+    if (any(temp_bb$xmin < ext$xmin,
+            temp_bb$xmax > ext$xmax,
+            temp_bb$ymin < ext$ymin,
+            temp_bb$ymax > ext$ymax)) {
+
+        warning(
+            paste("HAND tiles are only available for",
+                  "the HUC6 regions overlaying Alabama.")
+        )
+
+    }
+
     # Number of columns/rows of HAND/Catchmask Rasters
     xnum   <- floor(280.3281)
     ynum   <- floor(273.7383)
@@ -281,8 +288,7 @@ get_hand_xy <- function(aoi) {
 
 #' function to check input type and projection.  All input types convert to a
 #' SpatialPointsDataFrame for point elevation and bbx for raster.
-#' @source Attribution: The `elevatr` R package.
-#'         \url{https://github.com/jhollist/elevatr}
+#'
 #' @keywords internal
 loc_check <- function(locations, prj = NULL) {
     loc_wkt <- sf::st_crs(locations)$wkt
@@ -333,8 +339,7 @@ loc_check <- function(locations, prj = NULL) {
 }
 
 #' @title Project bounding box and Expand if needed
-#' @source Attribution: The `elevatr` R package.
-#'         \url{https://github.com/jhollist/elevatr}
+#'
 #' @keywords internal
 proj_expand <- function(locations, prj, expand) {
 
@@ -363,8 +368,6 @@ proj_expand <- function(locations, prj, expand) {
 }
 
 #' @title Clip the HAND raster
-#' @source Attribution: The `elevatr` R package.
-#'         \url{https://github.com/jhollist/elevatr}
 #' @keywords internal
 clip_it <- function(rast, loc, expand, clip) {
     loc_wm <- sf::st_transform(loc, raster::crs(rast))
@@ -383,27 +386,21 @@ clip_it <- function(rast, loc, expand, clip) {
 }
 
 #' @title Estimate download size of DEMs
-#' @source Attribution: The `elevatr` R package.
-#'         \url{https://github.com/jhollist/elevatr}
 #' @param locations the locations
 #' @param z zoom level if source is aws
 #' @keywords internal
-estimate_raster_size <- function(locations, z = NULL) {
+estimate_raster_size <- function(locations) {
     locations <- sf::st_bbox(locations) %>%
                  sf::st_as_sfc() %>%
                  sf::st_as_sf() %>%
                  sf::st_transform(sf::st_crs("+init=EPSG:4326"))
 
-    z_res <- data.frame(
-        z = 0:14,
-        res_dd = c(0.54905236, 0.27452618, 0.15455633,
-                   0.07145545, 0.03719130, 0.01901903,
-                   0.00962056, 0.00483847, 0.00241219,
-                   0.00120434, 0.00060173, 0.00030075,
-                   0.00015035, 0.00007517, 0.00003758)
-    )
+    res <- c(0.54905236, 0.27452618, 0.15455633,
+             0.07145545, 0.03719130, 0.01901903,
+             0.00962056, 0.00483847, 0.00241219,
+             0.00120434, 0.00060173, 0.00030075,
+             0.00015035, 0.00007517, 0.00003758)
 
-    res      <- z_res[z_res$z == z, ]$res_dd
     bb       <- sf::st_bbox(locations)
     num_rows <- (bb$xmax - bb$xmin) / res
     num_cols <- (bb$ymax - bb$ymin) / res
