@@ -9,3 +9,4 @@ docs
 vignettes
 ^README\.Rmd$
 ^\.github$
+^codecov\.yml$

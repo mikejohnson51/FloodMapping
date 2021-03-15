@@ -26,7 +26,8 @@
 #'             to clip input point datasets.  Instead the bounding box is used.
 #' @param verbose Toggles on and off the note about units and coordinate
 #'                reference system, as well as download progress and merging
-#'                messages.
+#'                messages. This does **not** prevent download size related
+#'                messages from appearing.
 #' @param neg_to_na Some of the data sources return large negative numbers as
 #'                  missing data.  When the end result is a projected those
 #'                  large negative numbers can vary.  When set to TRUE, only
