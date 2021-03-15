@@ -7,9 +7,26 @@ reference:
     desc: ~
       Functions for flood mapping
     contents:
-      - '`getData`'
-      - '`getFlows`'
-      - '`map`'
+      - '`getRawData`'
+      - '`map_flood`'
+      - '`download_ut`'
+  - title: HAND Tiles Functions
+    desc: ~
+      Functions for gathering HAND tiles
+    contents:
+      - '`get_hand_raster`'
+      - '`download_tiles`'
+      - '`merge_hand_tiles`'
+  - title: SRC Functions
+    desc: ~
+      Functions for generating synthetic rating curves
+    contents:
+      - '`get_src`'
+      - '`get_roughness`'
+      - '`get_catchmask`'
+      - '`find_comids`'
+      - '`compute_cellres`'
+      - '`compute_flat_tub`'
 navbar:
   left:
     - icon: fa-home
@@ -17,10 +34,14 @@ navbar:
     - text: "Documentation"
       icon: fas fa-book
       menu:
-      -  text: Getting Started
-         href: articles/index.html
-      -  text: Getting Static Data
-         href: articles/getData.html
-    - icon: fa-file-code-o
-      text: "functions"
+      - text: Getting Started
+        href: articles/index.html
+      - text: Getting Static Data
+        href: articles/getData.html
+      - text: Pulling HAND Tiles from AWS
+        href: articles/getHAND.html
+      - text: Generating Synthetic Rating Curves
+        href: articles/generateSRC.html
+    - icon: fa-file-code
+      text: "Functions"
       href: reference/index.html

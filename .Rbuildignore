@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 LIVINGFLOOD
 inProgress
+pkgdown
 .travis.yml
 _pkgdown.yml
 docs
