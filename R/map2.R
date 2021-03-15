@@ -3,9 +3,9 @@
 #' @param hand.path a path to HAND tif
 #' @param catchment.path a path to catchmask tif
 #' @param flows.path a path to a flows nc file
-#' @param add numeric. A uniform depth to add to simulated inudation
+#' @param add numeric. A uniform depth to add to simulated inundation
 #' @param threshold a value to exclude values less then
-#' @return a raster stack of innudation maps
+#' @return a raster stack of inundation maps
 #' @export
 #' @importFrom raster raster getValues stack addLayer
 #' @importFrom dplyr filter rename left_join mutate
