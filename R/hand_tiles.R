@@ -25,7 +25,8 @@
 #'             locations should be used to clip the HAND. Locations are not used
 #'             to clip input point datasets.  Instead the bounding box is used.
 #' @param verbose Toggles on and off the note about units and coordinate
-#'                reference system.
+#'                reference system, as well as download progress and merging
+#'                messages.
 #' @param neg_to_na Some of the data sources return large negative numbers as
 #'                  missing data.  When the end result is a projected those
 #'                  large negative numbers can vary.  When set to TRUE, only
@@ -48,7 +49,7 @@ get_hand_raster <- function(locations, prj = NULL,
 
     clip <- match.arg(clip)
 
-    # Check location type and if sp, set prj.  If no prj (for either) then error
+    # Check location type and if sf, set prj. If no prj (for either) then error
     locations <- loc_check(locations, prj)
     prj       <- sf::st_crs(locations)$wkt
 
@@ -83,6 +84,7 @@ get_hand_raster <- function(locations, prj = NULL,
         z = 0,
         prj = prj,
         expand = expand,
+        verbose = verbose,
         ...
     )
 
@@ -116,10 +118,11 @@ get_hand_raster <- function(locations, prj = NULL,
 #' @param bbx a \code{sf::st_bbox} object that is used to select x,y,z tiles.
 #' @param z The zoom level to return. The HAND tiles only use `z = 0`.
 #' @param prj PROJ.4 string for input bbox
-#' @param expand A numeric value of a distance, in map units, used to expand the
+#' @param expand A numeric value of a distance, in meters, used to expand the
 #'               bounding box that is used to fetch the tiles. This can
 #'               be used for features that fall close to the edge of a tile and
 #'               additional area around the feature is desired. Default is NULL.
+#' @param verbose Verbose output
 #' @param ... Extra configuration parameters to be passed to httr::GET.  Common
 #'            usage is to adjust timeout.  This is done as
 #'            \code{config=timeout(x)} where \code{x} is a numeric value in
@@ -128,7 +131,11 @@ get_hand_raster <- function(locations, prj = NULL,
 #' @importFrom progress progress_bar
 #' @export
 #' @keywords internal
-download_tiles <- function(locations, z = 0, prj, expand = NULL, ...) {
+download_tiles <- function(locations,
+                           z = 0, prj,
+                           expand = NULL,
+                           verbose = TRUE,
+                           ...) {
     # Expand (if needed) and re-project bbx to dd
     bbx        <- proj_expand(locations, prj, expand)
     base_url   <- "https://s3-tilemap.s3.amazonaws.com/geotiff-prod"
@@ -141,15 +148,19 @@ download_tiles <- function(locations, z = 0, prj, expand = NULL, ...) {
 
     hand_list  <- vector("list", length = nrow(tiles))
 
-    pb  <- progress::progress_bar$new(
-        format = "Downloading HAND [:bar] :percent eta: :eta",
-        total  = length(hand_urls),
-        clear  = FALSE,
-        width  = 60
-    )
+    if (verbose) {
+        pb  <- progress::progress_bar$new(
+            format = "Downloading HAND [:bar] :percent eta: :eta",
+            total  = length(hand_urls),
+            clear  = FALSE,
+            width  = 60
+        )
+    }
 
     for (i in seq_along(hand_urls)) {
-        pb$tick()
+
+        if (verbose) pb$tick()
+
         tmpfile <- tempfile(fileext = ".tif")
         resp <- httr::GET(
             hand_urls[i],
@@ -170,7 +181,7 @@ download_tiles <- function(locations, z = 0, prj, expand = NULL, ...) {
         hand_list[[i]] <- tmpfile
     }
 
-    merge_hand_tiles(hand_list, target_prj = prj)
+    merge_hand_tiles(hand_list, target_prj = prj, verbose = verbose)
 }
 
 #' @title Merge Rasters
@@ -186,14 +197,16 @@ download_tiles <- function(locations, z = 0, prj, expand = NULL, ...) {
 #'               for `gdalwarp`.
 #' @param returnRaster if TRUE, return a raster object (default),
 #'                     else, return the file path to the object
+#' @param verbose Verbose output
 #' @export
 #' @keywords internal
 merge_hand_tiles <- function(raster_list,
                              target_prj,
                              method = "bilinear",
-                             return_raster = TRUE) {
+                             return_raster = TRUE,
+                             verbose = TRUE) {
 
-    message("Mosaicing & Projecting")
+    if (verbose) message("Mosaicing & Projecting")
 
     destfile <- tempfile(fileext = ".tif")
     files    <- unlist(raster_list)
@@ -361,7 +374,16 @@ proj_expand <- function(locations, prj, expand) {
 
     bbx <- sf::st_as_sfc(sf::st_bbox(locations))
     if (!is.null(expand)) {
-        bbx <- sf::st_buffer(sf::st_as_sf(bbx), expand)
+        bbx <- bbx %>%
+               sf::st_as_sf() %>%
+               sf::st_transform(5070) %>%
+               sf::st_buffer(
+                   expand,
+                   joinStyle = "MITRE",
+                   endCapStyle = "SQUARE",
+                   mitreLimit = 2
+               ) %>%
+               sf::st_transform(crs = sf::st_crs(prj)$wkt)
     }
 
     sf::st_bbox(bbx)

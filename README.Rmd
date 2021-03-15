@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 
 [![Build Status](https://travis-ci.org/mikejohnson51/FloodMapping.svg?branch=master)](https://travis-ci.org/mikejohnson51/FloodMapping)
+[![R-CMD-check](https://github.com/mikejohnson51/FloodMapping/workflows/R-CMD-check/badge.svg)](https://github.com/mikejohnson51/FloodMapping/actions)
 [![DOI](https://zenodo.org/badge/130427796.svg)](https://zenodo.org/badge/latestdoi/130427796)
 <!-- badges: end -->
 
