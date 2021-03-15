@@ -406,5 +406,5 @@ estimate_raster_size <- function(locations) {
     num_cols <- (bb$ymax - bb$ymin) / res
 
     num_megabytes <- (num_rows * num_cols * 32) / 8388608
-    num_megabytes
+    sum(num_megabytes)
 }
