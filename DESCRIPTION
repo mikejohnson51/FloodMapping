@@ -26,7 +26,7 @@ Imports:
     raster,
     RNetCDF,
     sf
-Remotes: mikejohnson51/nwmHistoric
+Remotes: mikejohnson51/nwmTools
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 7.1.1
