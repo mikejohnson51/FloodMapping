@@ -57,6 +57,7 @@ get_hand_raster <- function(locations, prj = NULL,
     # Check download size and provide feedback, stop if too big!
     dl_size <- estimate_raster_size(locations)
 
+    # nocov start
     if (dl_size > 100 & dl_size < 500) {
         message(paste0("Note: Your request will download approximately ",
                        round(dl_size, 1), "Mb."))
@@ -78,6 +79,7 @@ get_hand_raster <- function(locations, prj = NULL,
             .call = FALSE
         )
     }
+    # nocov end
 
     # Pass of locations to APIs to get data as raster
     raster_hand <- download_tiles(
@@ -89,10 +91,12 @@ get_hand_raster <- function(locations, prj = NULL,
         ...
     )
 
+    # nocov start
     if (clip != "tile") {
-        message(paste("Clipping DEM to", clip))
+        if (verbose) message(paste("Clipping DEM to", clip))
         raster_hand <- clip_it(raster_hand, locations, expand, clip)
     }
+    # nocov end
 
     if (verbose) {
         message(
@@ -172,12 +176,14 @@ download_tiles <- function(locations,
             ...
         )
 
+        # nocov start
         if (!grepl("image/tif", httr::http_type(resp))) {
             stop(
                 paste("This url:", hand_urls[i], "did not return a tif"),
                 .call = FALSE
             )
         }
+        # nocov end
 
         hand_list[[i]] <- tmpfile
     }
@@ -247,16 +253,23 @@ get_hand_xy <- function(aoi) {
                       ymax = 35.97485)
 
     if ("bbox" %in% class(aoi)) {
-        temp_bb <- aoi
-    } else {
-        temp_bb <- sf::st_transform(aoi, 4326) %>%
+        bb <- aoi
+    } else if ("sf" %in% class(aoi)) {
+        bb <- sf::st_transform(aoi, 4326) %>%
                    sf::st_bbox()
+    } else {
+        bb <- aoi %>%
+              sf::st_as_sf(
+                  coords = c(1, 2),
+                  crs = 4326
+              ) %>%
+              sf::st_bbox()
     }
 
-    if (any(temp_bb$xmin < ext$xmin,
-            temp_bb$xmax > ext$xmax,
-            temp_bb$ymin < ext$ymin,
-            temp_bb$ymax > ext$ymax)) {
+    if (any(bb$xmin < ext$xmin,
+            bb$xmax > ext$xmax,
+            bb$ymin < ext$ymin,
+            bb$ymax > ext$ymax)) {
 
         warning(
             paste("HAND tiles are only available for",
@@ -272,20 +285,6 @@ get_hand_xy <- function(aoi) {
     # Get all Lat/Lon coordinates
     xarray <- seq(ext$xmin, ext$xmax, length.out = xnum)
     yarray <- seq(ext$ymin, ext$ymax, length.out = ynum)
-
-    # Get bounding box of AOI
-    if ("sf" %in% class(aoi)) {
-        bb <- sf::st_bbox(aoi)
-    } else if ("bbox" %in% class(aoi)) {
-        bb <- aoi
-    } else {
-        bb <- c(xmin = aoi[1, 1],
-                ymin = aoi[2, 1],
-                xmax = aoi[1, 2],
-                ymax = aoi[2, 2])
-
-        bb <- sf::st_bbox(bb)
-    }
 
     # Find indices from intersections
     xs <- which.min(abs(xarray - bb$xmin)):which.min(abs(xarray - bb$xmax))
@@ -394,15 +393,20 @@ proj_expand <- function(locations, prj, expand) {
 #' @keywords internal
 clip_it <- function(rast, loc, expand, clip) {
     loc_wm <- sf::st_transform(loc, raster::crs(rast))
-    if (clip == "locations" & !grepl("Points", class(loc_wm))) {
+
+    if (is.null(clip)) {
+        hand <- rast
+    } else if (clip == "locations") {
         hand <- raster::mask(raster::crop(rast, loc_wm), loc_wm)
-    } else if (clip == "bbox" | grepl("Points", class(loc_wm))) {
+    } else if (clip == "bbox") {
         bbx <- proj_expand(loc_wm, as.character(raster::crs(rast)), expand)
         bbx_sf <- sf::st_transform(
             sf::st_as_sf(sf::st_as_sfc(bbx)),
             raster::crs(rast)
         )
         hand <- raster::mask(raster::crop(rast, bbx_sf), bbx_sf)
+    } else {
+        hand <- rast
     }
 
     hand

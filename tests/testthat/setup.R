@@ -63,7 +63,9 @@ expected_aoi_inside <- structure(
 )
 
 # Smaller AOI than Mobile River, for faster tests
-appling_bend      <- AOI::aoi_get(x = "Appling Bend")
+appling_bend <- AOI::aoi_get(x = "Appling Bend")
+# Instantiate once so we don't have repeat requests too many times
+ab_raster <- get_hand_raster(appling_bend, verbose = FALSE)
 single_good_comid <- 18523225
 
 # Both object and expected should
