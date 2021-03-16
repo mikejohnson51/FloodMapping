@@ -39,7 +39,7 @@ library(AOI)
 library(leaflet)
 library(stars)
 library(leafem)
-library(nwmHistoric)
+library(nwmTools)
 library(FloodMapping)
 
 raw.dir <-'/Users/mikejohnson/Desktop/test_nomads.tmp/'
@@ -49,10 +49,8 @@ project.name <- "KU"
 
 files <- getRawData(AOI, dir = raw.dir, project.name)
 
-files$flows.path <- nwmHistoric::create_nomads_nc(
-  type = "analysis_assim", num  = 1,
-  dstfile = paste0(raw.dir, project.name, '/flows.nc')
-)
+files$flows.path <- nwmTools::create_nwm_nc(type = "analysis_assim", num  = 1,
+  dstfile = paste0(raw.dir, project.name, '/flows.nc'))
   
 
 maps  = map_flood(

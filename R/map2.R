@@ -33,7 +33,7 @@ map_flood = function(hand.path, catchment.path,
                     f     = var.get.nc(ahg_connection, "f", unpack = TRUE))
 
 
-  flows = nwmHistoric::extract_nwm(flows.path, comids = comids)  %>%
+  flows = nwmTools::extract_nwm(flows.path, comids = comids)  %>%
     dplyr::left_join(ahg, by = "comid") %>%
     dplyr::mutate(depths = c * .data$values ^ f)
 
