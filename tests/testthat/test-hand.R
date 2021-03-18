@@ -139,7 +139,7 @@ test_that("proj_expand() buffers correctly", {
 
 # * -------------------------------------------------------------
 # * Unit Tests for: clip_it()
-# * -------------------------------------------------------------
+# * -------------------------------------------------------------``
 test_that("clip_it() returns a raster", {
     expect_s4_class(
         clip_it(ab_raster, appling_bend, NULL, NULL),
