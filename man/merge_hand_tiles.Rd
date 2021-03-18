@@ -8,7 +8,8 @@ merge_hand_tiles(
   raster_list,
   target_prj,
   method = "bilinear",
-  return_raster = TRUE
+  return_raster = TRUE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ merge_hand_tiles(
 \item{method}{the method for resampling/reprojecting. Default is 'bilinear'.
 Options can be found on the GDAL documentation site
 for \code{gdalwarp}.}
+
+\item{verbose}{Verbose output}
 
 \item{returnRaster}{if TRUE, return a raster object (default),
 else, return the file path to the object}

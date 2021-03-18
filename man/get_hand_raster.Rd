@@ -38,7 +38,9 @@ locations should be used to clip the HAND. Locations are not used
 to clip input point datasets.  Instead the bounding box is used.}
 
 \item{verbose}{Toggles on and off the note about units and coordinate
-reference system.}
+reference system, as well as download progress and merging
+messages. This does \strong{not} prevent download size related
+messages from appearing.}
 
 \item{neg_to_na}{Some of the data sources return large negative numbers as
 missing data.  When the end result is a projected those

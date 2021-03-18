@@ -4,7 +4,14 @@
 \alias{get_src}
 \title{Generate Synthetic Rating Curve}
 \usage{
-get_src(comids, hand, stage = 0:20, progress = TRUE, slope_scale = 111120)
+get_src(
+  comids,
+  hand,
+  stage = 0:20,
+  progress = TRUE,
+  slope_scale = 111120,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{comids}{A set of COMIDs. See \link{find_comids}.}
@@ -18,6 +25,8 @@ get_src(comids, hand, stage = 0:20, progress = TRUE, slope_scale = 111120)
 \item{slope_scale}{Ratio of vertical units to horizontal.
 Uses \code{slope_scale = 111120} by default.
 See \href{https://gdal.org/programs/gdaldem.html}{gdaldem}.}
+
+\item{verbose}{Verbose output for HAND download.}
 }
 \value{
 A \code{data.frame} representing the SRC table.

@@ -4,17 +4,19 @@
 \alias{download_tiles}
 \title{Get HAND Tiles from an AWS S3 Bucket}
 \usage{
-download_tiles(locations, z = 0, prj, expand = NULL, ...)
+download_tiles(locations, z = 0, prj, expand = NULL, verbose = TRUE, ...)
 }
 \arguments{
 \item{z}{The zoom level to return. The HAND tiles only use \code{z = 0}.}
 
 \item{prj}{PROJ.4 string for input bbox}
 
-\item{expand}{A numeric value of a distance, in map units, used to expand the
+\item{expand}{A numeric value of a distance, in meters, used to expand the
 bounding box that is used to fetch the tiles. This can
 be used for features that fall close to the edge of a tile and
 additional area around the feature is desired. Default is NULL.}
+
+\item{verbose}{Verbose output}
 
 \item{...}{Extra configuration parameters to be passed to httr::GET.  Common
 usage is to adjust timeout.  This is done as

@@ -16,25 +16,6 @@ get_src <- function(comids, hand, stage = 0:20,
                     progress = TRUE, slope_scale = 111120,
                     verbose = TRUE) {
     # nocov start
-    if (progress) {
-        pb <- progress::progress_bar$new(
-            total = length(stage) + 3,
-            format = " generating SRC [:bar] :percent eta: :eta"
-        )
-
-        pb$tick(0)
-    }
-    # nocov end
-
-    if (any(missing(comids), is.null(comids), is.na(comids)) &
-        missing(hand)) {
-
-        stop(
-            "[get_src()] one of `comids` or `hand` needs to be passed.",
-            .call = FALSE
-        )
-
-    }
 
     if (missing(comids) & !missing(hand)) {
         hand_bb <- sf::st_bbox(hand) %>%
@@ -50,30 +31,59 @@ get_src <- function(comids, hand, stage = 0:20,
         hand <- get_hand_raster(nhd, verbose = verbose, clip = "locations")
     }
 
+    if (any(missing(comids), is.null(comids), is.na(comids)) &
+        missing(hand)) {
+
+        stop(
+            "[get_src()] one of `comids` or `hand` needs to be passed.",
+            .call = FALSE
+        )
+
+    }
+
+    if (progress) {
+        pb <- progress::progress_bar$new(
+            total = length(stage) + 3,
+            format = " generating SRC [:bar] :percent eta: :eta"
+        )
+
+        pb$tick(0)
+    }
+    # nocov end
+
     # Fix NA values
     hand[is.na(hand[])] <- 0
-    # Generate Slope Raster
-    tmp <- tempfile(fileext = ".tif")
 
+    # Get tempfiles for HAND and Slope rasters
+    tmp_slope <- tempfile(fileext = ".tif")
+    tmp_hand  <- tempfile(fileext = ".tif")
+
+    # Temporarily write HAND to file
+    raster::writeRaster(x = hand, filename = tmp_hand)
+
+    # Generate Slope Raster
     sf::gdal_utils(util = "demprocessing",
-                   source = hand@file@name,
-                   destination = tmp,
+                   source = tmp_hand,
+                   destination = tmp_slope,
                    processing = "slope",
                    options = c(
                        "-p",
                        "-s", as.character(slope_scale)
                    ))
 
-    slope <- raster::raster(tmp)
+    slope <- raster::raster(tmp_slope)
     slope[is.na(slope[])] <- 0
-    unlink(tmp)
+
+    # Delete temporary rasters
+    unlink(tmp_slope)
+    unlink(tmp_hand)
 
     # Get raster cell resolution
     res <- compute_cellres(hand)
-    # Create HAND_Slope data frame
 
     if (progress) pb$tick() # nocov
 
+    # Create HAND_Slope data frame
     hand_slope <-
         data.frame(
             hand = raster::getValues(hand),
