@@ -11,6 +11,7 @@
 #' @importFrom nhdplusTools get_vaa
 #' @importFrom data.table :=
 #' @importFrom plyr .
+#' @importFrom stats na.omit
 #' @export
 get_src <- function(comids, hand, stage = 0:20,
                     progress = TRUE, slope_scale = 111120,
@@ -89,7 +90,7 @@ get_src <- function(comids, hand, stage = 0:20,
             hand = raster::getValues(hand),
             slope = raster::getValues(slope)
         ) %>%
-        na.omit() %>%
+        stats::na.omit() %>%
         dplyr::arrange(hand) %>%
         dplyr::mutate(
             res = res,
@@ -111,7 +112,7 @@ get_src <- function(comids, hand, stage = 0:20,
             )
         ) %>%
         dplyr::filter(comid %in% comids) %>%
-        na.omit()
+        stats::na.omit()
 
     if (progress) pb$tick() # nocov
 

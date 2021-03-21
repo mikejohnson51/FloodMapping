@@ -19,7 +19,7 @@ Imports:
     httr,
     magrittr,
     nhdplusTools,
-    nwmHistoric,
+    nwmTools,
     plyr,
     progress,
     rlang,

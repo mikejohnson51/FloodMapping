@@ -13,12 +13,12 @@ map_flood(hand.path, catchment.path, flows.path, add = 0, threshold = 0)
 
 \item{flows.path}{a path to a flows nc file}
 
-\item{add}{numeric. A uniform depth to add to simulated inudation}
+\item{add}{numeric. A uniform depth to add to simulated inundation}
 
 \item{threshold}{a value to exclude values less then}
 }
 \value{
-a raster stack of innudation maps
+a raster stack of inundation maps
 }
 \description{
 This function takes a folder of processed data and generates a HAND inundation raster for each timestep
