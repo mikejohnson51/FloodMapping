@@ -9,6 +9,9 @@ get_hand_xy(aoi)
 \arguments{
 \item{aoi}{Area of interest}
 }
+\value{
+Grid of XY coordinates
+}
 \description{
 Get HAND Tile XY Coordinates
 }

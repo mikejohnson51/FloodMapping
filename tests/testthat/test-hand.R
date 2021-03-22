@@ -1,14 +1,19 @@
 # * -------------------------------------------------------------
 # * Unit Tests for: get_hand_raster()
+# * These are skipped on CRAN and CI environments
 # * -------------------------------------------------------------
 test_that("get_hand_raster() returns a raster", {
+    skip_on_cran()
+    skip_on_ci()
     expect_s4_class(
-        ab_raster,
+        get_hand_raster(appling_bend, verbose = FALSE),
         "RasterLayer"
     )
 })
 
 test_that("get_hand_raster() returns the correct/usable extent", {
+    skip_on_cran()
+    skip_on_ci()
     expect_true(
         check_extent(
             inside_bb  = sf::st_bbox(appling_bend),
@@ -17,21 +22,28 @@ test_that("get_hand_raster() returns the correct/usable extent", {
     )
 })
 
-test_that("get_hand_raster does not return verbose output", {
+test_that("get_hand_raster() does not return verbose output", {
+    skip_on_cran()
+    skip_on_ci()
     expect_silent(
         get_hand_raster(appling_bend, verbose = FALSE)
     )
 })
 
 test_that("get_hand_raster() returns with verbose output", {
-    expect_message(
+    skip_on_cran()
+    skip_on_ci()
+    suppressMessages(expect_message(
         get_hand_raster(appling_bend, verbose = TRUE)
-    )
+    ))
 })
 
 test_that("get_hand_raster() does not contain negative values", {
+    skip_on_cran()
+    skip_on_ci()
+    temp_raster <- get_hand_raster(appling_bend, neg_to_na = TRUE)
     expect_true(
-        all(get_hand_raster(appling_bend, neg_to_na = TRUE)[] >= 0)
+        all(is.na(temp_raster[temp_raster < 0]))
     )
 })
 
@@ -139,7 +151,7 @@ test_that("proj_expand() buffers correctly", {
 
 # * -------------------------------------------------------------
 # * Unit Tests for: clip_it()
-# * -------------------------------------------------------------``
+# * -------------------------------------------------------------
 test_that("clip_it() returns a raster", {
     expect_s4_class(
         clip_it(ab_raster, appling_bend, NULL, NULL),
@@ -187,3 +199,107 @@ test_that("clip_it() returns a raster", {
 #>
 #>     expect_true(AOI::aoi_inside(tmp_inside, tmp_outside))
 #> })
+
+# * -------------------------------------------------------------
+# * Unit Tests for: loc_check()
+# * -------------------------------------------------------------
+
+test_that("loc_check() returns a `sf` object", {
+    # `sf`
+    expect_s3_class(loc_check(appling_bend), "sf")
+    expect_s3_class(loc_check(appling_bend, prj = 5070), "sf")
+
+    # `raster`
+    expect_s3_class(loc_check(ab_raster), "sf")
+    expect_s3_class(loc_check(ab_raster, prj = 5070), "sf")
+
+    # `bbox`
+    expect_s3_class(loc_check(sf::st_bbox(appling_bend)), "sf")
+    expect_s3_class(loc_check(sf::st_bbox(appling_bend), prj = 5070), "sf")
+
+    # `data.frame` or `matrix`
+    expect_s3_class(
+        loc_check(sf::st_coordinates(appling_bend), prj = 4326),
+        "sf"
+    )
+    expect_s3_class(
+        loc_check(
+            as.data.frame(sf::st_coordinates(appling_bend)),
+            prj = 4326
+        ),
+        "sf"
+    )
+})
+
+test_that("loc_check() projects to different crs", {
+    # `sf`
+    expect_true(
+        loc_check(appling_bend, prj = 5070) %>%
+            sf::st_crs() %>%
+            `$`(epsg) %>%
+            `==`(5070)
+    )
+
+    # `raster`
+    expect_true(
+        loc_check(ab_raster, prj = 5070) %>%
+            sf::st_crs() %>%
+            `$`(epsg) %>%
+            `==`(5070)
+    )
+
+    # `bbox`
+    expect_true(
+        loc_check(sf::st_bbox(appling_bend), prj = 5070) %>%
+            sf::st_crs() %>%
+            `$`(epsg) %>%
+            `==`(5070)
+    )
+})
+
+test_that("loc_check() throws correct errors", {
+    temp <- appling_bend
+    sf::st_crs(temp) <- NA
+    expect_error(loc_check(temp))
+
+    sf::st_crs(temp) <- ""
+    expect_error(loc_check(temp))
+
+    expect_error(loc_check("test"))
+    expect_error(loc_check(123))
+})
+
+test_that("loc_check() finds coordinate columns in data.frame", {
+    coords <- sf::st_coordinates(appling_bend)
+    expect_s3_class(loc_check(coords, prj = 4326), "sf")
+    expect_s3_class(loc_check(as.data.frame(coords), prj = 4326), "sf")
+
+    colnames(coords) <- c("x", "y", "L1", "L2")
+    expect_s3_class(loc_check(coords, prj = 4326), "sf")
+    expect_s3_class(loc_check(as.data.frame(coords), prj = 4326), "sf")
+
+    colnames(coords) <- c("lon", "lat", "L1", "L2")
+    expect_s3_class(loc_check(coords, prj = 4326), "sf")
+    expect_s3_class(loc_check(as.data.frame(coords), prj = 4326), "sf")
+
+    colnames(coords) <- c("longitude", "latitude", "L1", "L2")
+    expect_s3_class(loc_check(coords, prj = 4326), "sf")
+    expect_s3_class(loc_check(as.data.frame(coords), prj = 4326), "sf")
+
+    colnames(coords) <- c("unknownx", "unknowny", "L1", "L2")
+    expect_error(loc_check(coords, prj = 4326))
+    expect_error(loc_check(as.data.frame(coords), prj = 4326))
+})
+
+# * -------------------------------------------------------------
+# * Unit Tests for: estimate_raster_size()
+# * -------------------------------------------------------------
+
+test_that("estimate_raster_size() returns a single element", {
+    expect_true(length(estimate_raster_size(appling_bend)) <= 1)
+})
+
+test_that("estimate_raster_size() is nonnegative", {
+    expect_true(estimate_raster_size(appling_bend) >= 0)
+    expect_true(estimate_raster_size(ab_raster) >= 0)
+})

@@ -8,8 +8,9 @@ estimate_raster_size(locations)
 }
 \arguments{
 \item{locations}{the locations}
-
-\item{z}{zoom level if source is aws}
+}
+\value{
+\code{numeric} of estimated download size
 }
 \description{
 Estimate download size of DEMs

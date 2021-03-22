@@ -4,7 +4,14 @@
 \alias{download_tiles}
 \title{Get HAND Tiles from an AWS S3 Bucket}
 \usage{
-download_tiles(locations, z = 0, prj, expand = NULL, verbose = TRUE, ...)
+download_tiles(
+  locations,
+  z = 0,
+  prj,
+  expand = NULL,
+  verbose = getOption("verbose"),
+  ...
+)
 }
 \arguments{
 \item{z}{The zoom level to return. The HAND tiles only use \code{z = 0}.}
@@ -18,8 +25,8 @@ additional area around the feature is desired. Default is NULL.}
 
 \item{verbose}{Verbose output}
 
-\item{...}{Extra configuration parameters to be passed to httr::GET.  Common
-usage is to adjust timeout.  This is done as
+\item{...}{Extra configuration parameters to be passed to httr::GET. Common
+usage is to adjust timeout. This is done as
 \code{config=timeout(x)} where \code{x} is a numeric value in
 seconds. Multiple configuration functions may be passed as a
 vector.}

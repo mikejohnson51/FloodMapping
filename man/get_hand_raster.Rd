@@ -9,7 +9,7 @@ get_hand_raster(
   prj = NULL,
   expand = NULL,
   clip = c("tile", "bbox", "locations"),
-  verbose = TRUE,
+  verbose = getOption("verbose"),
   neg_to_na = FALSE,
   override_size_check = FALSE,
   ...

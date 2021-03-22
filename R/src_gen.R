@@ -15,8 +15,12 @@
 #' @export
 get_src <- function(comids, hand, stage = 0:20,
                     progress = TRUE, slope_scale = 111120,
-                    verbose = TRUE) {
+                    verbose = getOption("verbose")) {
     # nocov start
+    if (missing(comids) & missing(hand)) {
+        stop("[get_src()] one of `comids` or `hand` needs to be passed.",
+             .call = FALSE)
+    }
 
     if (missing(comids) & !missing(hand)) {
         hand_bb <- sf::st_bbox(hand) %>%
@@ -26,20 +30,16 @@ get_src <- function(comids, hand, stage = 0:20,
         comids <- find_comids(hand_bb)
     }
 
+    if (any(is.na(comids), is.null(comids), is.nan(comids)) &
+        missing(hand)) {
+        stop("[get_src()] `comids` can't be NA/NaN/NULL",
+             .call = FALSE)
+    }
+
     # If the HAND raster is not passed, get from AWS
     if (missing(hand) & !missing(comids)) {
         nhd <- nhdplusTools::get_nhdplus(comid = comids)
         hand <- get_hand_raster(nhd, verbose = verbose, clip = "locations")
-    }
-
-    if (any(missing(comids), is.null(comids), is.na(comids)) &
-        missing(hand)) {
-
-        stop(
-            "[get_src()] one of `comids` or `hand` needs to be passed.",
-            .call = FALSE
-        )
-
     }
 
     if (progress) {
@@ -50,6 +50,7 @@ get_src <- function(comids, hand, stage = 0:20,
 
         pb$tick(0)
     }
+
     # nocov end
 
     # Fix NA values
@@ -144,7 +145,6 @@ get_src <- function(comids, hand, stage = 0:20,
         dplyr::rename(COMID = comid)
 
     synthetic_rating_curve
-    # nocov end
 }
 
 #' @title Get catchmask raster via nhdplusTools

@@ -45,7 +45,7 @@
 get_hand_raster <- function(locations, prj = NULL,
                             expand = NULL,
                             clip = c("tile", "bbox", "locations"),
-                            verbose = TRUE, neg_to_na = FALSE,
+                            verbose = getOption("verbose"), neg_to_na = FALSE,
                             override_size_check = FALSE, ...) {
 
     clip <- match.arg(clip)
@@ -128,8 +128,8 @@ get_hand_raster <- function(locations, prj = NULL,
 #'               be used for features that fall close to the edge of a tile and
 #'               additional area around the feature is desired. Default is NULL.
 #' @param verbose Verbose output
-#' @param ... Extra configuration parameters to be passed to httr::GET.  Common
-#'            usage is to adjust timeout.  This is done as
+#' @param ... Extra configuration parameters to be passed to httr::GET. Common
+#'            usage is to adjust timeout. This is done as
 #'            \code{config=timeout(x)} where \code{x} is a numeric value in
 #'            seconds. Multiple configuration functions may be passed as a
 #'            vector.
@@ -139,7 +139,7 @@ get_hand_raster <- function(locations, prj = NULL,
 download_tiles <- function(locations,
                            z = 0, prj,
                            expand = NULL,
-                           verbose = TRUE,
+                           verbose = getOption("verbose"),
                            ...) {
     # Expand (if needed) and re-project bbx to dd
     bbx        <- proj_expand(locations, prj, expand)
@@ -244,6 +244,7 @@ merge_hand_tiles <- function(raster_list,
 
 #' @title Get HAND Tile XY Coordinates
 #' @param aoi Area of interest
+#' @return Grid of XY coordinates
 #' @keywords internal
 get_hand_xy <- function(aoi) {
     # Extent of HAND/Catchmask Rasters
@@ -253,10 +254,15 @@ get_hand_xy <- function(aoi) {
                       ymax = 35.97485)
 
     if ("bbox" %in% class(aoi)) {
-        bb <- aoi
+        # Ensure bounding box is in lat/lon
+        bb <- aoi %>%
+              sf::st_as_sfc() %>%
+              sf::st_as_sf() %>%
+              sf::st_transform(4326) %>%
+              sf::st_bbox()
     } else if ("sf" %in% class(aoi)) {
         bb <- sf::st_transform(aoi, 4326) %>%
-                   sf::st_bbox()
+              sf::st_bbox()
     } else {
         bb <- aoi %>%
               sf::st_as_sf(
@@ -299,60 +305,83 @@ get_hand_xy <- function(aoi) {
     xy_tiles
 }
 
-#' function to check input type and projection.  All input types convert to a
-#' SpatialPointsDataFrame for point elevation and bbx for raster.
-#'
+#' @title Function to check input type and projection.
+#' @param locations AOI
+#' @param prj CRS
+#' @return `sf` object
 #' @keywords internal
 loc_check <- function(locations, prj = NULL) {
-    loc_wkt <- sf::st_crs(locations)$wkt
+    loc_cls <- class(locations)
+    loc_crs <- suppressWarnings(sf::st_crs(locations))
+    loc_wkt <- loc_crs$wkt
+    loc_chk <- any(is.null(loc_wkt),
+                   is.na(loc_wkt),
+                   nchar(loc_wkt) == 0)
 
-    if ("sf" %in% class(locations)) {
-        if (!is.null(prj)) {
-            locations <- sf::st_transform(locations, crs = prj$wkt)
-        }
-    } else if (class(locations) == "data.frame") {
-        if (is.null(prj)) {
-            stop("Please supply a valid WKT string.")
-        }
-        if (ncol(locations) > 2) {
-            df <- data.frame(locations[, 3:ncol(locations)],
-                             vector("numeric", nrow(locations)))
-            names(df) <- c(names(locations)[3:ncol(locations)],
-                           "hand")
-        } else {
-            df <- data.frame(vector("numeric", nrow(locations)))
-            names(df) <- "hand"
-        }
+    # If both `loc_wkt` and `prj` are invalid, throw error
+    if (all(loc_chk, is.null(prj))) {
+        stop("Please supply a valid WKT string.")
+    }
 
-        locations <- sf::st_as_sf(
-            x = cbind(sf::st_coordinates(locations[, 1:2]), df),
-            coords = c("X", "Y"),
-            wkt = prj$wkt,
-        )
-    } else if (attributes(class(locations)) %in% c("raster")) {
-        if (
-            (is.null(loc_wkt) | nchar(loc_wkt) == 0 | is.na(loc_wkt)) &
-            is.null(prj)
-        ) {
-            stop("Please supply a valid WKT string.")
-        }
+    if (all(!loc_chk, is.null(prj))) {
+        prj <- loc_crs
+    }
 
-        if (is.null(loc_wkt) | nchar(loc_wkt) == 0 | is.na(loc_wkt)) {
-            if (sum(!is.na(raster::getValues(locations))) == 0) {
+    # Assume `prj` is an EPSG code
+    if (any(is.character(prj), is.numeric(prj))) {
+        prj <- sf::st_crs(prj)
+    }
+
+    if ("sf" %in% loc_cls) {
+        # locations is `sf`
+        locations <- sf::st_transform(locations, crs = prj)
+    } else if ("raster" %in% attributes(loc_cls)) {
+        # locations is `raster`
+        if (loc_chk & sum(!is.na(locations[]) == 0)) {
                 stop("No distinct points, all values NA.")
-            } else {
-                locations <-
-                    raster::rasterToPoints(locations) %>%
-                    sf::st_as_sf(coords = c("x", "y"), wkt = prj$wkt)
-            }
+        } else {
+            locations <-
+                raster::rasterToPoints(locations) %>%
+                as.data.frame() %>%
+                sf::st_as_sf(coords = c("x", "y"), crs = prj)
         }
+    } else if ("bbox" %in% loc_cls) {
+        # locations is `bbox`
+        locations <- sf::st_as_sfc(locations) %>%
+                     sf::st_as_sf() %>%
+                     sf::st_transform(crs = prj$wkt)
+    } else if (any("data.frame" %in% loc_cls, "matrix" %in% loc_cls)) {
+        # locations is `data.frame` or `matrix`
+        loc_names <- colnames(locations)
+        xcoord    <- which(tolower(loc_names) %in% c("x", "lon", "longitude"))
+        ycoord    <- which(tolower(loc_names) %in% c("y", "lat", "latitude"))
+
+        if (any(length(xcoord) == 0, length(ycoord) == 0)) {
+            stop("`locations` has no coordinate columns.")
+        }
+
+        locations <-
+            sf::st_bbox(
+                c(xmin = min(locations[, xcoord]),
+                  xmax = max(locations[, xcoord]),
+                  ymin = min(locations[, ycoord]),
+                  ymax = max(locations[, ycoord])),
+                crs = prj
+            ) %>%
+            sf::st_as_sfc() %>%
+            sf::st_as_sf()
+    } else {
+        stop(loc_cls, " not supported.")
     }
 
     locations
 }
 
 #' @title Project bounding box and Expand if needed
-#'
+#' @param locations AOI
+#' @param prj CRS
+#' @param expand Amount to expand (in meters)
+#' @return `bbox` object
 #' @keywords internal
 proj_expand <- function(locations, prj, expand) {
 
@@ -390,6 +419,11 @@ proj_expand <- function(locations, prj, expand) {
 }
 
 #' @title Clip the HAND raster
+#' @param rast `raster` object
+#' @param loc AOI to clip `rast` to
+#' @param expand Amount to expand (in meters)
+#' @param clip Clipping type
+#' @return Clipped `raster`
 #' @keywords internal
 clip_it <- function(rast, loc, expand, clip) {
     loc_wm <- sf::st_transform(loc, raster::crs(rast))
@@ -414,7 +448,7 @@ clip_it <- function(rast, loc, expand, clip) {
 
 #' @title Estimate download size of DEMs
 #' @param locations the locations
-#' @param z zoom level if source is aws
+#' @return `numeric` of estimated download size
 #' @keywords internal
 estimate_raster_size <- function(locations) {
     locations <- sf::st_bbox(locations) %>%

@@ -6,6 +6,18 @@
 \usage{
 clip_it(rast, loc, expand, clip)
 }
+\arguments{
+\item{rast}{\code{raster} object}
+
+\item{loc}{AOI to clip \code{rast} to}
+
+\item{expand}{Amount to expand (in meters)}
+
+\item{clip}{Clipping type}
+}
+\value{
+Clipped \code{raster}
+}
 \description{
 Clip the HAND raster
 }

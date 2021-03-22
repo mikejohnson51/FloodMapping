@@ -11,7 +11,7 @@ Description: This package aggregates the needed data to map flood extents using
     to past events archived by the NWM.
 Encoding: UTF-8
 Depends:
-    R(>= 3.3.0),
+    R(>= 3.5.0),
 Imports:
     data.table,
     dplyr,

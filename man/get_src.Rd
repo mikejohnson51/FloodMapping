@@ -10,7 +10,7 @@ get_src(
   stage = 0:20,
   progress = TRUE,
   slope_scale = 111120,
-  verbose = TRUE
+  verbose = getOption("verbose")
 )
 }
 \arguments{
