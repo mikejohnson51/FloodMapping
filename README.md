@@ -8,8 +8,7 @@
 [![Build
 Status](https://travis-ci.org/mikejohnson51/FloodMapping.svg?branch=master)](https://travis-ci.org/mikejohnson51/FloodMapping)
 [![R-CMD-check](https://github.com/mikejohnson51/FloodMapping/workflows/R-CMD-check/badge.svg)](https://github.com/mikejohnson51/FloodMapping/actions)
-[![Coverage
-Status](https://img.shields.io/coveralls/mikejohnson51/FloodMapping.svg)](https://coveralls.io/r/mikejohnson51/FloodMapping?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/mikejohnson51/FloodMapping/badge.svg?branch=master)](https://coveralls.io/github/mikejohnson51/FloodMapping?branch=master)
 [![DOI](https://zenodo.org/badge/130427796.svg)](https://zenodo.org/badge/latestdoi/130427796)
 <!-- badges: end -->
 
