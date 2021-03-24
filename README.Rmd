@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 [![Build Status](https://travis-ci.org/mikejohnson51/FloodMapping.svg?branch=master)](https://travis-ci.org/mikejohnson51/FloodMapping)
 [![R-CMD-check](https://github.com/mikejohnson51/FloodMapping/workflows/R-CMD-check/badge.svg)](https://github.com/mikejohnson51/FloodMapping/actions)
-[![Codecov test coverage](https://codecov.io/gh/mikejohnson51/FloodMapping/branch/master/graph/badge.svg)](https://codecov.io/gh/mikejohnson51/FloodMapping?branch=master)
+[![Coverage Status](https://img.shields.io/coveralls/mikejohnson51/FloodMapping.svg)](https://coveralls.io/r/mikejohnson51/FloodMapping?branch=master)
 [![DOI](https://zenodo.org/badge/130427796.svg)](https://zenodo.org/badge/latestdoi/130427796)
 <!-- badges: end -->
 
