@@ -12,6 +12,7 @@
 #' @importFrom data.table :=
 #' @importFrom plyr .
 #' @importFrom stats na.omit
+#' @importFrom rlang .data
 #' @export
 get_src <- function(comids, hand, stage = 0:20,
                     progress = TRUE, slope_scale = 111120,
@@ -92,10 +93,10 @@ get_src <- function(comids, hand, stage = 0:20,
             slope = raster::getValues(slope)
         ) %>%
         stats::na.omit() %>%
-        dplyr::arrange(hand) %>%
+        dplyr::arrange(.data$hand) %>%
         dplyr::mutate(
             res = res,
-            BA  = res * res * sqrt(1 + slope)
+            BA  = res * res * sqrt(1 + .data$slope)
         )
 
     if (progress) pb$tick() # nocov
@@ -112,7 +113,7 @@ get_src <- function(comids, hand, stage = 0:20,
                 "roughness"
             )
         ) %>%
-        dplyr::filter(comid %in% comids) %>%
+        dplyr::filter(.data$comid %in% comids) %>%
         stats::na.omit()
 
     if (progress) pb$tick() # nocov
@@ -125,24 +126,26 @@ get_src <- function(comids, hand, stage = 0:20,
                 if (progress) pb$tick() # nocov
 
                 vaa %>%
-                    dplyr::group_by(comid) %>%
+                    dplyr::group_by(.data$comid) %>%
                     dplyr::mutate(
-                        n_prod = sqrt(slope) / ((lengthkm * 1000) * roughness),
+                        n_prod = sqrt(.data$slope) /
+                                 ((.data$lengthkm * 1000) *
+                                  .data$roughness),
                         Y = y
                     ) %>%
                     dplyr::ungroup() %>%
                     dplyr::filter(dplyr::across(.fns = is.finite)) %>%
                     data.table::as.data.table() %>%
                     .[,
-                      Q := compute_flat_tub(y, hand_slope) * n_prod,
+                      Q := compute_flat_tub(y, hand_slope) * .data$n_prod,
                       by = .(comid)
                      ]
             }
         ) %>%
         data.table::rbindlist() %>%
         as.data.frame() %>%
-        dplyr::select(comid, Y, Q) %>%
-        dplyr::rename(COMID = comid)
+        dplyr::select(.data$comid, .data$Y, .data$Q) %>%
+        dplyr::rename(COMID = .data$comid)
 
     synthetic_rating_curve
 }
