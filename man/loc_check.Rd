@@ -2,13 +2,19 @@
 % Please edit documentation in R/hand_tiles.R
 \name{loc_check}
 \alias{loc_check}
-\title{function to check input type and projection.  All input types convert to a
-SpatialPointsDataFrame for point elevation and bbx for raster.}
+\title{Function to check input type and projection.}
 \usage{
 loc_check(locations, prj = NULL)
 }
+\arguments{
+\item{locations}{AOI}
+
+\item{prj}{CRS}
+}
+\value{
+\code{sf} object
+}
 \description{
-function to check input type and projection.  All input types convert to a
-SpatialPointsDataFrame for point elevation and bbx for raster.
+Function to check input type and projection.
 }
 \keyword{internal}

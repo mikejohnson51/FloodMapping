@@ -10,7 +10,7 @@
 #' @importFrom raster raster getValues stack addLayer
 #' @importFrom dplyr filter rename left_join mutate
 #' @importFrom RNetCDF open.nc var.get.nc
-#' @importFrom nwmHistoric extract_nwm
+#' @importFrom nwmTools extract_nwm
 #' @importFrom rlang .data
 
 map_flood = function(hand.path, catchment.path,

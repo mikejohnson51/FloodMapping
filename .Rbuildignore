@@ -8,3 +8,5 @@ _pkgdown.yml
 docs
 vignettes
 ^README\.Rmd$
+^\.github$
+^codecov\.yml$

@@ -6,6 +6,16 @@
 \usage{
 proj_expand(locations, prj, expand)
 }
+\arguments{
+\item{locations}{AOI}
+
+\item{prj}{CRS}
+
+\item{expand}{Amount to expand (in meters)}
+}
+\value{
+\code{bbox} object
+}
 \description{
 Project bounding box and Expand if needed
 }

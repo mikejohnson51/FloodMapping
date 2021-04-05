@@ -6,20 +6,21 @@
 #' @param slope_scale Ratio of vertical units to horizontal.
 #'                    Uses \code{slope_scale = 111120} by default.
 #'                    See [gdaldem](https://gdal.org/programs/gdaldem.html).
+#' @param verbose Verbose output for HAND download.
 #' @return A \code{data.frame} representing the SRC table.
 #' @importFrom nhdplusTools get_vaa
 #' @importFrom data.table :=
 #' @importFrom plyr .
+#' @importFrom stats na.omit
+#' @importFrom rlang .data
 #' @export
 get_src <- function(comids, hand, stage = 0:20,
-                    progress = TRUE, slope_scale = 111120) {
-    if (progress) {
-        pb <- progress::progress_bar$new(
-            total = length(stage) + 3,
-            format = " generating SRC [:bar] :percent eta: :eta"
-        )
-
-        pb$tick(0)
+                    progress = TRUE, slope_scale = 111120,
+                    verbose = getOption("verbose")) {
+    # nocov start
+    if (missing(comids) & missing(hand)) {
+        stop("[get_src()] one of `comids` or `hand` needs to be passed.",
+             .call = FALSE)
     }
 
     if (missing(comids) & !missing(hand)) {
@@ -30,49 +31,75 @@ get_src <- function(comids, hand, stage = 0:20,
         comids <- find_comids(hand_bb)
     }
 
+    if (any(is.na(comids), is.null(comids), is.nan(comids)) &
+        missing(hand)) {
+        stop("[get_src()] `comids` can't be NA/NaN/NULL",
+             .call = FALSE)
+    }
+
     # If the HAND raster is not passed, get from AWS
     if (missing(hand) & !missing(comids)) {
         nhd <- nhdplusTools::get_nhdplus(comid = comids)
-        hand <- get_hand_raster(nhd)
+        hand <- get_hand_raster(nhd, verbose = verbose, clip = "locations")
     }
+
+    if (progress) {
+        pb <- progress::progress_bar$new(
+            total = length(stage) + 3,
+            format = " generating SRC [:bar] :percent eta: :eta"
+        )
+
+        pb$tick(0)
+    }
+
+    # nocov end
 
     # Fix NA values
     hand[is.na(hand[])] <- 0
-    # Generate Slope Raster
-    tmp <- tempfile(fileext = ".tif")
 
+    # Get tempfiles for HAND and Slope rasters
+    tmp_slope <- tempfile(fileext = ".tif")
+    tmp_hand  <- tempfile(fileext = ".tif")
+
+    # Temporarily write HAND to file
+    raster::writeRaster(x = hand, filename = tmp_hand)
+
+    # Generate Slope Raster
     sf::gdal_utils(util = "demprocessing",
-                   source = hand@file@name,
-                   destination = tmp,
+                   source = tmp_hand,
+                   destination = tmp_slope,
                    processing = "slope",
                    options = c(
                        "-p",
                        "-s", as.character(slope_scale)
                    ))
 
-    slope <- raster::raster(tmp)
+    slope <- raster::raster(tmp_slope)
     slope[is.na(slope[])] <- 0
-    unlink(tmp)
+
+    # Delete temporary rasters
+    unlink(tmp_slope)
+    unlink(tmp_hand)
 
     # Get raster cell resolution
     res <- compute_cellres(hand)
+
+    if (progress) pb$tick() # nocov
+
     # Create HAND_Slope data frame
-
-    if (progress) pb$tick()
-
     hand_slope <-
         data.frame(
             hand = raster::getValues(hand),
             slope = raster::getValues(slope)
         ) %>%
-        na.omit() %>%
-        dplyr::arrange(hand) %>%
+        stats::na.omit() %>%
+        dplyr::arrange(.data$hand) %>%
         dplyr::mutate(
             res = res,
-            BA  = res * res * sqrt(1 + slope)
+            BA  = res * res * sqrt(1 + .data$slope)
         )
 
-    if (progress) pb$tick()
+    if (progress) pb$tick() # nocov
 
     # Get VAAs via nhdplusTools
     vaa <-
@@ -86,37 +113,39 @@ get_src <- function(comids, hand, stage = 0:20,
                 "roughness"
             )
         ) %>%
-        dplyr::filter(comid %in% comids) %>%
-        na.omit()
+        dplyr::filter(.data$comid %in% comids) %>%
+        stats::na.omit()
 
-    if (progress) pb$tick()
+    if (progress) pb$tick() # nocov
 
     synthetic_rating_curve <-
         lapply(
             stage,
             FUN = function(y) {
 
-                if (progress) pb$tick()
+                if (progress) pb$tick() # nocov
 
                 vaa %>%
-                    dplyr::group_by(comid) %>%
+                    dplyr::group_by(.data$comid) %>%
                     dplyr::mutate(
-                        n_prod = sqrt(slope) / ((lengthkm * 1000) * roughness),
+                        n_prod = sqrt(.data$slope) /
+                                 ((.data$lengthkm * 1000) *
+                                  .data$roughness),
                         Y = y
                     ) %>%
                     dplyr::ungroup() %>%
                     dplyr::filter(dplyr::across(.fns = is.finite)) %>%
                     data.table::as.data.table() %>%
                     .[,
-                      Q := compute_flat_tub(y, hand_slope) * n_prod,
+                      Q := compute_flat_tub(y, hand_slope) * .data$n_prod,
                       by = .(comid)
                      ]
             }
         ) %>%
         data.table::rbindlist() %>%
         as.data.frame() %>%
-        dplyr::select(comid, Y, Q) %>%
-        dplyr::rename(COMID = comid)
+        dplyr::select(.data$comid, .data$Y, .data$Q) %>%
+        dplyr::rename(COMID = .data$comid)
 
     synthetic_rating_curve
 }
@@ -165,6 +194,10 @@ get_catchmask <- function(aoi, template) {
 #' @return A roughness value
 #' @export
 get_roughness <- function(pathlength, arbolatesu, lengthkm, areasqkm, slope) {
+    if (!is.numeric(unlist(as.list(environment())))) {
+        stop("[get_roughness()] All parameters must be numeric", .call = FALSE)
+    }
+
     response <- httr::content(
         httr::POST(
             url = "https://src-api.justinsingh.me/roughness",
@@ -183,12 +216,12 @@ get_roughness <- function(pathlength, arbolatesu, lengthkm, areasqkm, slope) {
 
 #' @title Find COMIDs for an AOI via the NHD
 #' @param aoi An area of interest. Can be retrieved via \code{AOI::aoi_get}.
-#' @return A \code{vector} of COMIDs.
+#' @return A \code{factor vector} of COMIDs.
 #' @importFrom nhdplusTools get_nhdplus
 #' @keywords internal
 #' @export
 find_comids <- function(aoi) {
-    nhdplusTools::get_nhdplus(aoi)$comid
+    as.numeric(nhdplusTools::get_nhdplus(aoi)$comid)
 }
 
 #' @title Get cell resolution
@@ -218,5 +251,7 @@ compute_flat_tub <- function(stage, df) {
 
         return(final * ((final / bed_area) ^ (2 / 3)))
     },
-    error = function(cond) {return(NA)})
+    error = function(cond) {
+        return(NA)
+    })
 }

@@ -11,7 +11,7 @@ Description: This package aggregates the needed data to map flood extents using
     to past events archived by the NWM.
 Encoding: UTF-8
 Depends:
-    R(>= 3.3.0),
+    R(>= 3.5.0),
 Imports:
     data.table,
     dplyr,
@@ -19,7 +19,7 @@ Imports:
     httr,
     magrittr,
     nhdplusTools,
-    nwmHistoric,
+    nwmTools,
     plyr,
     progress,
     rlang,
@@ -31,3 +31,7 @@ License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
+Suggests: 
+    testthat (>= 3.0.0),
+    covr
+Config/testthat/edition: 3

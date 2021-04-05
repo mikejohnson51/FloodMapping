@@ -10,7 +10,7 @@ find_comids(aoi)
 \item{aoi}{An area of interest. Can be retrieved via \code{AOI::aoi_get}.}
 }
 \value{
-A \code{vector} of COMIDs.
+A \code{factor vector} of COMIDs.
 }
 \description{
 Find COMIDs for an AOI via the NHD

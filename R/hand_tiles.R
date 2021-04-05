@@ -25,7 +25,9 @@
 #'             locations should be used to clip the HAND. Locations are not used
 #'             to clip input point datasets.  Instead the bounding box is used.
 #' @param verbose Toggles on and off the note about units and coordinate
-#'                reference system.
+#'                reference system, as well as download progress and merging
+#'                messages. This does **not** prevent download size related
+#'                messages from appearing.
 #' @param neg_to_na Some of the data sources return large negative numbers as
 #'                  missing data.  When the end result is a projected those
 #'                  large negative numbers can vary.  When set to TRUE, only
@@ -43,18 +45,19 @@
 get_hand_raster <- function(locations, prj = NULL,
                             expand = NULL,
                             clip = c("tile", "bbox", "locations"),
-                            verbose = TRUE, neg_to_na = FALSE,
+                            verbose = getOption("verbose"), neg_to_na = FALSE,
                             override_size_check = FALSE, ...) {
 
     clip <- match.arg(clip)
 
-    # Check location type and if sp, set prj.  If no prj (for either) then error
+    # Check location type and if sf, set prj. If no prj (for either) then error
     locations <- loc_check(locations, prj)
     prj       <- sf::st_crs(locations)$wkt
 
     # Check download size and provide feedback, stop if too big!
     dl_size <- estimate_raster_size(locations)
 
+    # nocov start
     if (dl_size > 100 & dl_size < 500) {
         message(paste0("Note: Your request will download approximately ",
                        round(dl_size, 1), "Mb."))
@@ -76,6 +79,7 @@ get_hand_raster <- function(locations, prj = NULL,
             .call = FALSE
         )
     }
+    # nocov end
 
     # Pass of locations to APIs to get data as raster
     raster_hand <- download_tiles(
@@ -83,13 +87,16 @@ get_hand_raster <- function(locations, prj = NULL,
         z = 0,
         prj = prj,
         expand = expand,
+        verbose = verbose,
         ...
     )
 
+    # nocov start
     if (clip != "tile") {
-        message(paste("Clipping DEM to", clip))
+        if (verbose) message(paste("Clipping DEM to", clip))
         raster_hand <- clip_it(raster_hand, locations, expand, clip)
     }
+    # nocov end
 
     if (verbose) {
         message(
@@ -116,19 +123,24 @@ get_hand_raster <- function(locations, prj = NULL,
 #' @param bbx a \code{sf::st_bbox} object that is used to select x,y,z tiles.
 #' @param z The zoom level to return. The HAND tiles only use `z = 0`.
 #' @param prj PROJ.4 string for input bbox
-#' @param expand A numeric value of a distance, in map units, used to expand the
+#' @param expand A numeric value of a distance, in meters, used to expand the
 #'               bounding box that is used to fetch the tiles. This can
 #'               be used for features that fall close to the edge of a tile and
 #'               additional area around the feature is desired. Default is NULL.
-#' @param ... Extra configuration parameters to be passed to httr::GET.  Common
-#'            usage is to adjust timeout.  This is done as
+#' @param verbose Verbose output
+#' @param ... Extra configuration parameters to be passed to httr::GET. Common
+#'            usage is to adjust timeout. This is done as
 #'            \code{config=timeout(x)} where \code{x} is a numeric value in
 #'            seconds. Multiple configuration functions may be passed as a
 #'            vector.
 #' @importFrom progress progress_bar
 #' @export
 #' @keywords internal
-download_tiles <- function(locations, z = 0, prj, expand = NULL, ...) {
+download_tiles <- function(locations,
+                           z = 0, prj,
+                           expand = NULL,
+                           verbose = getOption("verbose"),
+                           ...) {
     # Expand (if needed) and re-project bbx to dd
     bbx        <- proj_expand(locations, prj, expand)
     base_url   <- "https://s3-tilemap.s3.amazonaws.com/geotiff-prod"
@@ -141,15 +153,19 @@ download_tiles <- function(locations, z = 0, prj, expand = NULL, ...) {
 
     hand_list  <- vector("list", length = nrow(tiles))
 
-    pb  <- progress::progress_bar$new(
-        format = "Downloading HAND [:bar] :percent eta: :eta",
-        total  = length(hand_urls),
-        clear  = FALSE,
-        width  = 60
-    )
+    if (verbose) {
+        pb  <- progress::progress_bar$new(
+            format = "Downloading HAND [:bar] :percent eta: :eta",
+            total  = length(hand_urls),
+            clear  = FALSE,
+            width  = 60
+        )
+    }
 
     for (i in seq_along(hand_urls)) {
-        pb$tick()
+
+        if (verbose) pb$tick()
+
         tmpfile <- tempfile(fileext = ".tif")
         resp <- httr::GET(
             hand_urls[i],
@@ -160,17 +176,19 @@ download_tiles <- function(locations, z = 0, prj, expand = NULL, ...) {
             ...
         )
 
+        # nocov start
         if (!grepl("image/tif", httr::http_type(resp))) {
             stop(
                 paste("This url:", hand_urls[i], "did not return a tif"),
                 .call = FALSE
             )
         }
+        # nocov end
 
         hand_list[[i]] <- tmpfile
     }
 
-    merge_hand_tiles(hand_list, target_prj = prj)
+    merge_hand_tiles(hand_list, target_prj = prj, verbose = verbose)
 }
 
 #' @title Merge Rasters
@@ -186,14 +204,16 @@ download_tiles <- function(locations, z = 0, prj, expand = NULL, ...) {
 #'               for `gdalwarp`.
 #' @param returnRaster if TRUE, return a raster object (default),
 #'                     else, return the file path to the object
+#' @param verbose Verbose output
 #' @export
 #' @keywords internal
 merge_hand_tiles <- function(raster_list,
                              target_prj,
                              method = "bilinear",
-                             return_raster = TRUE) {
+                             return_raster = TRUE,
+                             verbose = TRUE) {
 
-    message("Mosaicing & Projecting")
+    if (verbose) message("Mosaicing & Projecting")
 
     destfile <- tempfile(fileext = ".tif")
     files    <- unlist(raster_list)
@@ -224,6 +244,7 @@ merge_hand_tiles <- function(raster_list,
 
 #' @title Get HAND Tile XY Coordinates
 #' @param aoi Area of interest
+#' @return Grid of XY coordinates
 #' @keywords internal
 get_hand_xy <- function(aoi) {
     # Extent of HAND/Catchmask Rasters
@@ -233,16 +254,28 @@ get_hand_xy <- function(aoi) {
                       ymax = 35.97485)
 
     if ("bbox" %in% class(aoi)) {
-        temp_bb <- aoi
+        # Ensure bounding box is in lat/lon
+        bb <- aoi %>%
+              sf::st_as_sfc() %>%
+              sf::st_as_sf() %>%
+              sf::st_transform(4326) %>%
+              sf::st_bbox()
+    } else if ("sf" %in% class(aoi)) {
+        bb <- sf::st_transform(aoi, 4326) %>%
+              sf::st_bbox()
     } else {
-        temp_bb <- sf::st_transform(aoi, 4326) %>%
-                   sf::st_bbox()
+        bb <- aoi %>%
+              sf::st_as_sf(
+                  coords = c(1, 2),
+                  crs = 4326
+              ) %>%
+              sf::st_bbox()
     }
 
-    if (any(temp_bb$xmin < ext$xmin,
-            temp_bb$xmax > ext$xmax,
-            temp_bb$ymin < ext$ymin,
-            temp_bb$ymax > ext$ymax)) {
+    if (any(bb$xmin < ext$xmin,
+            bb$xmax > ext$xmax,
+            bb$ymin < ext$ymin,
+            bb$ymax > ext$ymax)) {
 
         warning(
             paste("HAND tiles are only available for",
@@ -259,20 +292,6 @@ get_hand_xy <- function(aoi) {
     xarray <- seq(ext$xmin, ext$xmax, length.out = xnum)
     yarray <- seq(ext$ymin, ext$ymax, length.out = ynum)
 
-    # Get bounding box of AOI
-    if ("sf" %in% class(aoi)) {
-        bb <- sf::st_bbox(aoi)
-    } else if ("bbox" %in% class(aoi)) {
-        bb <- aoi
-    } else {
-        bb <- c(xmin = aoi[1, 1],
-                ymin = aoi[2, 1],
-                xmax = aoi[1, 2],
-                ymax = aoi[2, 2])
-
-        bb <- sf::st_bbox(bb)
-    }
-
     # Find indices from intersections
     xs <- which.min(abs(xarray - bb$xmin)):which.min(abs(xarray - bb$xmax))
     ys <- which.min(abs(yarray - bb$ymin)):which.min(abs(yarray - bb$ymax))
@@ -286,60 +305,83 @@ get_hand_xy <- function(aoi) {
     xy_tiles
 }
 
-#' function to check input type and projection.  All input types convert to a
-#' SpatialPointsDataFrame for point elevation and bbx for raster.
-#'
+#' @title Function to check input type and projection.
+#' @param locations AOI
+#' @param prj CRS
+#' @return `sf` object
 #' @keywords internal
 loc_check <- function(locations, prj = NULL) {
-    loc_wkt <- sf::st_crs(locations)$wkt
+    loc_cls <- class(locations)
+    loc_crs <- suppressWarnings(sf::st_crs(locations))
+    loc_wkt <- loc_crs$wkt
+    loc_chk <- any(is.null(loc_wkt),
+                   is.na(loc_wkt),
+                   nchar(loc_wkt) == 0)
 
-    if ("sf" %in% class(locations)) {
-        if (!is.null(prj)) {
-            locations <- sf::st_transform(locations, crs = prj$wkt)
-        }
-    } else if (class(locations) == "data.frame") {
-        if (is.null(prj)) {
-            stop("Please supply a valid WKT string.")
-        }
-        if (ncol(locations) > 2) {
-            df <- data.frame(locations[, 3:ncol(locations)],
-                             vector("numeric", nrow(locations)))
-            names(df) <- c(names(locations)[3:ncol(locations)],
-                           "hand")
-        } else {
-            df <- data.frame(vector("numeric", nrow(locations)))
-            names(df) <- "hand"
-        }
+    # If both `loc_wkt` and `prj` are invalid, throw error
+    if (all(loc_chk, is.null(prj))) {
+        stop("Please supply a valid WKT string.")
+    }
 
-        locations <- sf::st_as_sf(
-            x = cbind(sf::st_coordinates(locations[, 1:2]), df),
-            coords = c("X", "Y"),
-            wkt = prj$wkt,
-        )
-    } else if (attributes(class(locations)) %in% c("raster")) {
-        if (
-            (is.null(loc_wkt) | nchar(loc_wkt) == 0 | is.na(loc_wkt)) &
-            is.null(prj)
-        ) {
-            stop("Please supply a valid WKT string.")
-        }
+    if (all(!loc_chk, is.null(prj))) {
+        prj <- loc_crs
+    }
 
-        if (is.null(loc_wkt) | nchar(loc_wkt) == 0 | is.na(loc_wkt)) {
-            if (sum(!is.na(raster::getValues(locations))) == 0) {
+    # Assume `prj` is an EPSG code
+    if (any(is.character(prj), is.numeric(prj))) {
+        prj <- sf::st_crs(prj)
+    }
+
+    if ("sf" %in% loc_cls) {
+        # locations is `sf`
+        locations <- sf::st_transform(locations, crs = prj)
+    } else if ("raster" %in% attributes(loc_cls)) {
+        # locations is `raster`
+        if (loc_chk & sum(!is.na(locations[]) == 0)) {
                 stop("No distinct points, all values NA.")
-            } else {
-                locations <-
-                    raster::rasterToPoints(locations) %>%
-                    sf::st_as_sf(coords = c("x", "y"), wkt = prj$wkt)
-            }
+        } else {
+            locations <-
+                raster::rasterToPoints(locations) %>%
+                as.data.frame() %>%
+                sf::st_as_sf(coords = c("x", "y"), crs = prj)
         }
+    } else if ("bbox" %in% loc_cls) {
+        # locations is `bbox`
+        locations <- sf::st_as_sfc(locations) %>%
+                     sf::st_as_sf() %>%
+                     sf::st_transform(crs = prj$wkt)
+    } else if (any("data.frame" %in% loc_cls, "matrix" %in% loc_cls)) {
+        # locations is `data.frame` or `matrix`
+        loc_names <- colnames(locations)
+        xcoord    <- which(tolower(loc_names) %in% c("x", "lon", "longitude"))
+        ycoord    <- which(tolower(loc_names) %in% c("y", "lat", "latitude"))
+
+        if (any(length(xcoord) == 0, length(ycoord) == 0)) {
+            stop("`locations` has no coordinate columns.")
+        }
+
+        locations <-
+            sf::st_bbox(
+                c(xmin = min(locations[, xcoord]),
+                  xmax = max(locations[, xcoord]),
+                  ymin = min(locations[, ycoord]),
+                  ymax = max(locations[, ycoord])),
+                crs = prj
+            ) %>%
+            sf::st_as_sfc() %>%
+            sf::st_as_sf()
+    } else {
+        stop(loc_cls, " not supported.")
     }
 
     locations
 }
 
 #' @title Project bounding box and Expand if needed
-#'
+#' @param locations AOI
+#' @param prj CRS
+#' @param expand Amount to expand (in meters)
+#' @return `bbox` object
 #' @keywords internal
 proj_expand <- function(locations, prj, expand) {
 
@@ -361,25 +403,44 @@ proj_expand <- function(locations, prj, expand) {
 
     bbx <- sf::st_as_sfc(sf::st_bbox(locations))
     if (!is.null(expand)) {
-        bbx <- sf::st_buffer(sf::st_as_sf(bbx), expand)
+        bbx <- bbx %>%
+               sf::st_as_sf() %>%
+               sf::st_transform(5070) %>%
+               sf::st_buffer(
+                   expand,
+                   joinStyle = "MITRE",
+                   endCapStyle = "SQUARE",
+                   mitreLimit = 2
+               ) %>%
+               sf::st_transform(crs = sf::st_crs(prj)$wkt)
     }
 
     sf::st_bbox(bbx)
 }
 
 #' @title Clip the HAND raster
+#' @param rast `raster` object
+#' @param loc AOI to clip `rast` to
+#' @param expand Amount to expand (in meters)
+#' @param clip Clipping type
+#' @return Clipped `raster`
 #' @keywords internal
 clip_it <- function(rast, loc, expand, clip) {
     loc_wm <- sf::st_transform(loc, raster::crs(rast))
-    if (clip == "locations" & !grepl("Points", class(loc_wm))) {
+
+    if (is.null(clip)) {
+        hand <- rast
+    } else if (clip == "locations") {
         hand <- raster::mask(raster::crop(rast, loc_wm), loc_wm)
-    } else if (clip == "bbox" | grepl("Points", class(loc_wm))) {
+    } else if (clip == "bbox") {
         bbx <- proj_expand(loc_wm, as.character(raster::crs(rast)), expand)
         bbx_sf <- sf::st_transform(
             sf::st_as_sf(sf::st_as_sfc(bbx)),
             raster::crs(rast)
         )
         hand <- raster::mask(raster::crop(rast, bbx_sf), bbx_sf)
+    } else {
+        hand <- rast
     }
 
     hand
@@ -387,7 +448,7 @@ clip_it <- function(rast, loc, expand, clip) {
 
 #' @title Estimate download size of DEMs
 #' @param locations the locations
-#' @param z zoom level if source is aws
+#' @return `numeric` of estimated download size
 #' @keywords internal
 estimate_raster_size <- function(locations) {
     locations <- sf::st_bbox(locations) %>%
@@ -406,5 +467,5 @@ estimate_raster_size <- function(locations) {
     num_cols <- (bb$ymax - bb$ymin) / res
 
     num_megabytes <- (num_rows * num_cols * 32) / 8388608
-    num_megabytes
+    sum(num_megabytes)
 }
